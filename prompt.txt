@@ -1,0 +1,486 @@
+I want to create a react frontend with questions and answers. Please an app with reusable components. 
+
+It's for now about these questions and answers:
+Deel 1: Algemene gegevens verzamelen patiënt
+-Persoonsgegevens
+Geslacht Leeftijd Lengte &amp; Gewicht
+☐ Man
+☐ Vrouw _____ jaar Lengte: ______ cm
+Gewicht: ______ kg
+-Woont u langer dan 10 jaar in Nederland en spreekt u voldoende Nederlands
+om medische informatie goed te begrijpen? (zodat we onze uitleg goed kunnen
+afstemmen op uw situatie)
+☐ Ja
+☐ Nee
+☐ Nee, maar ik heb op dit moment goede hulp bij me om deze vragenlijst in te
+vullen
+Deze vraag mogelijk goed inleiden, maar wel cruciaal om vroegtijdig te stellen.
+Antwoord: ‘’nee’’ moet mogelijk leiden tot stoppen van de vragenlijst. Andere
+mogelijkheid in de toekomst is om de vragenlijst ook in andere talen te vertalen.
+-Wat is uw hoogste afgeronde opleidingsniveau?
+
+☐ Geen opleiding ☐ Basisonderwijs ☐ Praktijkonderwijs / MBO-1 /
+
+VMBO-B
+
+☐ VMBO-T / MAVO / MBO-2
+/ MBO-3
+
+☐ HAVO / VWO /
+MBO-4 ☐ HBO / WO
+
+Opleidingsniveau is een indicatie voor gezondheidsvaardigheden en kan helpen bij
+het afstemmen van communicatie en zelfmanagementdoelen. Interpretatie: geen
+opleiding, basisonderwijs en ‘’praktijkonderwijs / MBO-1 / VMBO-B’’ geeft verhoogd
+risico op lage gezondheidsvaardigheden. ‘’VMBO-T / MAVO / MBO-2 / MBO-3’’ geeft
+middelmatige risico op lage gezondheidsvaardigheden. ‘’HAVO / VWO / MBO-4’’ en
+‘’HBO/WO’’ geeft laag risico op lage gezondheidsvaardigheden.
+
+-Heeft u andere aandoeningen of gezondheidsproblemen? (indien ja, geef aan
+welke meerdere opties mogelijk)
+
+☐ Osteoporose /
+botontkalking ☐ Diabetes mellitus ☐ Hart- of vaatziekten
+☐ COPD of andere
+longziekte ☐ Schildklieraandoening ☐ Migraine of
+hoofdpijnstoornis
+
+☐ Reuma, Bechterew of
+auto-immuunziekte ☐ Ziekte van Crohn / PDS
+
+☐ Neurologische
+aandoening (MS,
+Parkinson, hernia,
+neuropathie)
+
+☐ Psychische klachten
+of diagnose (depressie,
+angst, PTSS, burn-out)
+
+☐ Aandachts- of
+prikkelverwerkingsstoornis
+(ADD, ADHD, HSP, ASS)
+
+☐ Kanker (in verleden of
+huidig)
+
+☐ Overgewicht of
+obesitas (kan ook
+berekend worden via
+lengte/gewicht)
+
+☐ Andere aandoening, namelijk:
+___________
+
+-Medicatiecheck: gebruikt u één van de onderstaande medicijnen? (meerdere
+antwoorden mogelijk)
+
+☐ Pijnstillers / NSAID’s
+(paracetamol, ibuprofen,
+diclofenac)
+
+☐ Maagbeschermers
+(omeprazol, pantoprazol)
+
+☐ Bloedverdunners /
+antistolling (acenocoumarol,
+rivaroxaban, clopidogrel)
+
+☐ Bètablokkers
+(metoprolol, bisoprolol)
+
+☐ Corticosteroïden
+(prednison,
+dexamethason, fluticason)
+
+☐ Slaapmedicatie
+(temazepam, zolpidem,
+melatonine)
+
+☐ Antidepressiva /
+angstremmers
+(citalopram, diazepam,
+sertraline)
+
+☐ Diabetesmedicatie
+(metformine, insuline)
+
+☐ Chemotherapie /
+doelgerichte therapie
+(paclitaxel, imatinib)
+
+☐ Hormonale therapie
+(tamoxifen, anastrozol)
+
+☐ Andere medicatie:
+___________
+
+*In blauw gearceerd kan mogelijk weg, vullen ze anders ook in bij andere medicatie.
+Ook tussenhaakjes (de soorten medicatie) is mogelijk bij sommige medicatie
+overbodig.
+-Heeft u recent een operatie gehad?
+☐ Ja      ☐ Nee
+Zo ja, graag invullen:
+Datum: ________   Type ingreep:
+______________________________________
+
+-Alcoholgebruik en roken?
+Drinkt u alcohol? Rookt u?
+☐ Ja      ☐ Nee
+Zo ja: ______ glazen per ☐ dag ☐ week
+
+☐ Ja      ☐ Nee
+Zo ja: ______ sigaretten per dag
+
+Deel 2: Triage screening specifieke oorzaak lage rugklachten: ernstige pathologie
+(rode vlag) en neuropatische pijn / zenuwpijn (LRS)
+1. Zijn de klachten in de lage rug ontstaan direct na een val of ongeval?
+-&gt; nee: vervolg met andere screening
+-&gt; ja: ga door naar 1.1
+1.1. Betrof dit:
+a) Een val van meer dan 1 meter of meer dan 5 traptreden?
+b) Een ongeval met directe impact op de rug (bijv. aanrijding of zwaar object op de
+rug)?
+c) Anders, namelijk: _______
+2. Is dit uw allereerste keer in uw leven dat u lage rugpijn heeft?
+-ja
+-nee
+3. Voelt u zich de laatste tijd niet fit, bijvoorbeeld moe, grieperig of gewoon niet
+zoals normaal?
+-&gt; nee: vervolg met andere screening
+-&gt; ja: ga door naar 3.1
+3.1. Heeft u recent (afgelopen maand) last gehad van koorts, rillingen,
+verhoging van uw lichaamstemperatuur of nachtzweten?
+-ja
+-nee
+3.2. Bent u recent (afgelopen 3-6 maanden) onverklaard enorm (5-10% van uw
+gewicht verloren) afgevallen?
+-ja
+-nee
+4. Heeft u nachtelijke pijn?
+-&gt; nee: vervolg met andere screening
+-&gt; ja: ga door naar 4.1
+4.1. Verandert die pijn als u in een andere houding ligt, als u zich beweegt of
+als u uit bed stapt?
+-ja
+-nee
+5. Heeft u de laatste tijd meer moeite om uw plas of ontlasting op te houden?&quot;
+-ja
+-nee
+6. Heeft u uitstralende pijn in beide benen?
+-ja
+-nee
+
+7. Heeft u uitstralende pijn tot voorbij uw knie of staat de beenpijn meer op de
+voorgrond dan de lage rugpijn?
+-&gt; nee: screening voltooid
+-&gt; ja: ga door naar 7.1 – 7.4
+7.1 Heeft u last van branderig gevoel (bijv. als van brandnetels) of een
+kriebelend/prikkelend gevoel (alsof er mieren over uw been lopen of het gevoel alsof
+er een zwakke stroom door uw been gaat)?
+-ja
+-nee
+7.2. Heeft u last van heftige schietende pijnaanvallen, als elektrische scheuten?
+-ja
+-nee
+7.3. Heeft u duidelijk krachtsverlies of een doof gevoel in uw been of voet?
+-ja -&gt; alleen bij ja door naar 7.3.1.
+-nee
+7.3.1. Heeft u in de afgelopen 48 uur last gekregen van één of meer van de
+volgende klachten? (meerdere antwoorden mogelijk)
+☐ Plotseling krachtverlies in één of beide benen (bijv. moeite met opstaan, traplopen
+of door het been zakken)
+☐ Toenemend gevoelsverlies of een doof/tintelend gevoel in uw benen of armen
+☐ Toenemende moeite met lopen door krachtsverlies of instabiliteit, waardoor u
+sinds kort nauwelijks nog zelfstandig kunt lopen
+☐ Spierkrampen, stijfheid of ongecontroleerde bewegingen van uw armen of benen
+☐ Geen van bovenstaande
+☐ Weet ik niet
+7.4. Is lichte aanraking (kleding, beddengoed) of kou of warmte (badwater) in
+uw been of voet pijnlijk?
+-ja
+-nee
+7.5. Worden uw klachten erger wanneer u hoest, niest of perst?
+-ja
+-nee
+8. Extra screeningsvraag voor patiënten die langer dan &gt; 3 maanden lage
+rugpijn hebben en jonger zijn dan &lt; 45 jaar. Deze patiënten moeten vraag 8.1 -
+8.5
+8.1. Heeft u ochtendstijfheid die langer aanhoudt dan &gt; 30 minuten?
+-ja
+
+-nee
+8.2. Komt er in uw familie een vorm van reuma voor?
+-ja
+-nee
+8.3. Heeft u (nu of in het verleden) één of meer van de onderstaande klachten of
+aandoeningen gehad? (meerdere antwoorden mogelijk):
+☐ Psoriasis (schilferende huiduitslag, vaak op ellebogen, hoofdhuid of knieën)
+☐ Oogontsteking (rood, pijnlijk oog met lichtgevoeligheid)
+☐ Chronische darmontsteking (bijv. ziekte van Crohn of colitis ulcerosa)
+☐ Langdurige pijn of stijfheid aan de achillespees of onderkant van de voet
+(hiel)
+☐ Geen van bovenstaande
+
+8.4. Verminderen uw rugklachten als u in beweging komt of oefeningen doet
+(bijvoorbeeld wandelen, rekken of actief blijven), maar niet in rust?
+☐ Ja
+☐ Nee
+☐ Weet ik niet
+8.5. Heeft u eerder gemerkt dat pijnstillers zoals ibuprofen, naproxen of
+diclofenac (ontstekingsremmers) uw rugklachten goed en snel verlichten?
+☐ Ja
+☐ Nee
+☐ Weet ik niet
+
+
+
+This is extra content for the evaluation which I want to automate:
+
+AI redeneren op basis van de antwoorden van de bovenstaande
+screeningsvragen
+Op basis van de antwoorden van deze rode vlaggen screeningsvragen zouden we
+het ‘’level of concern’’ kunnen bepalen. Het begrip ‘’level of concern’’ komt uit het
+wetenschappelijke artikel van: Finucane (2020): ‘’International Framework for Red
+
+Flags For Potential Serious Spinal Pathologies’’. Het ‘’level of concern’’ toont een
+risicograad bij patiënten met lage rugpijn, op basis van klinische kenmerken die
+mogelijk wijzen op ernstige onderliggende aandoeningen (zoals fractuur, tumor,
+infectie, neurologische uitval). Het model gaat vaan laag risico (groen), naar hoog
+risico (rood) en helpt zorgprofessionals (waaronder fysiotherapeuten) om
+beslissingen te nemen over de noodzaak van doorverwijzing of het starten van
+therapie. In het Nederlands kunnen we het ‘’level of concern’’ vertalen naar
+‘’beoordelingsniveau van mogelijke ernst’’:
+-Laag (Groen): 0-30%
+-Gemiddeld (geel): 30-60%
+-Hoog: (rood): 60-80%
+-Zeer hoog (donkerrood): 80-100%
+
+In de lage rug zijn er grofweg 5 ernstige onderliggende specifieke aandoeningen die
+lage rugpijn kunnen veroorzaken dit zijn: een (osteoporose) wervelfractuur
+(prevalentie in de eerste lijn = tussen de 0.7%-4.5%), spinale maligniteit – tumor
+(prevalentie in de 1 ste lijn = 0.2%), axiale SpA (prevalentie in de 1 ste lijn = 0.1-1.4%),
+spinale infectie (prevalentie in de 1 ste lijn = 0.01%), cauda equina syndroom
+(prevalentie 0.002%). Zoals je ziet is de kans op een ernstige onderliggende
+pathologie klein. In minder dan &lt;1% van de gevallen is één van deze ernstige
+onderliggende aandoeningen de oorzaak van lage rugpijn. Deze prevalentie mogelijk
+meenemen in het AI-redeneren! Kortom de prevalentie is laag echter is het wel zeer
+belangrijk dat we deze patiënten eruit halen (triage).
+Naast deze ernstige onderliggende specifieke aandoening, onderscheiden we nog
+een niet-ernstige specifieke aandoening namelijk Lumbosacraal Radiculair Syndroom
+(LRS). Dit is een vorm van lage rugpijn waarbij zenuwwortelprikkeling betrokken is.
+De prevalentie van LRS in de eerste lijn is tussen de 1-5%.
+AI redeneren voor bepalen ‘’level of concern’’ wervelfractuur
+Interpretatie vanuit vraag 1.1: bij a of b zeer hoge verdenking op wervelfractuur, bij c
+verhoogde verdenking op wervelfractuur
+
+Interpretatie vanuit demografische gegevens: risico op (osteoporose) wervelfractuur
+neemt toe:
+-bij oudere leeftijd &gt;65 jaar
+-bij leeftijd &gt; 80 jaar nog hoger risico
+-Bij leeftijd &gt; 65 jaar en geslacht vrouw
+-osteoporose
+-langdurig gebruik van corticosteroïden (&gt;7.5mg, &gt; 3 maanden)
+-kanker in het verleden
+-overmatig alcohol gebruik &gt; 3 glazen per dag
+-overmatig roken &gt; 20 sigaretten per dag
+-wervelfractuur in het verleden (wordt nog nergens uitgevraagd)
+-reumatoïde artritis of diabetes
+-eetproblematiek, dieet, vitamine D tekort (wordt nog nergens uitgevraagd)
+-eerste episode van rugpijn ooit en leeftijd &gt; 50 jaar
+AI kan aan de hand van deze vraag 1 en vervolgvraag 1.1. in combinatie met de
+demografische gegevens gaan redeneren. Ik heb een inschatting gemaakt over in
+welke mate deze factoren het ‘’level of conern’’ verhogen. Deze inschatting wil ik
+uiteindelijk nog wel goed testen, mogelijk dat dit nog iets moet worden aangepast.
+Op deze manier kan AI gaan redeneren met de verschillende factoren.
+-donker rood: verhoogd het risico met 60%
+-rood: verhoogd het risico met 40%
+-oranje: verhoogd het risico met 30%
+-geel: verhoogd het risico met 20%
+
+Voorbeelden AI redenatie:
+-man 29 jaar, klachten zijn niet begonnen na een val, rookt niet, drinkt gemiddeld &lt; 3
+glazen per dag alcohol en geen andere aandoeningen. Level of concern op
+wervelfractuur is zeer laag (0%)
+-Vrouw 68 jaar, klachten zijn niet begonnen na een val, osteoporose aanwezig, drinkt
+geen alcohol / rookt niet en geen andere aandoeningen. Level of concern, gemiddeld
+(50%) op wervelfractuur. Verdere screening door fysiotherapeut vereist.
+-Man 70 jaar, klachten begonnen na val van de ladder (6 treden), verder geen andere
+aandoeningen, drinkt geen alcohol/rookt niet. Level of concern, zeer hoog (80%) op
+wervelfractuur. Doorverwijzing naar huisarts voor verdere screening in ziekenhuis
+middels een röntgenfoto lijkt geïndiceerd.
+
+AI redeneren voor bepalen ‘’level of concern’’ tumor (spinale maligniteit)
+Interpretatie vanuit vraag 2: Bij ja: wanneer dit de eerste episode rugpijn van iemand
+is en hij is &lt;20 jaar of &gt;50 jaar kan dit het risico op een tumor verhogen.
+Interpretatie vanuit vraag 3: bij ja: je de laatste tijd niet fit voelen / niet zoals normaal
+is een symptoom die bij veel klachten hoort, maar kan ook duiden op een
+
+onderliggende tumor. Zeker in combinatie met andere symptomen. Om deze reden
+verhoogd dit licht het ‘’level of concern’’ op een tumor
+Interpretatie vanuit vraag 3.1: bij ja, verhoogd dit ‘’level of concern’’ op een tumor
+Interpretatie vanuit vraag 3.2: bij ja, verhoogd dit ‘’level of concern’’ op een tumor
+Interpretatie vanuit vraag 4.1: bij nee, verhoogd dit ‘’level of concern’’ op een tumor
+Interpretatie vanuit vraag 6: een tumor kan op het ruggenmerg drukken en hierbij pijn
+in beide benen geven. Een tumor kan om deze reden ook LRS (zenuwpijn) geven.
+Zie ‘’redeneren’’ LRS. Een hoge waarschijnlijkheid op ‘’LRS’’ verhoogd om deze
+reden het level of concern op een tumor.
+Interpretatie vanuit demografische gegevens: risico op tumor neemt toe:
+-Kanker in de voorgeschiedenis, dit is vanuit de literatuur de hoogste
+risicofactor
+op een tumor, vandaar dat dit sterk het ‘’level of concern’’ op een tumor
+verhoogd
+AI kan aan de hand van deze vragen en eventuele vervolgvragen in combinatie met
+de demografische gegevens gaan redeneren. Ik heb een inschatting gemaakt over in
+welke mate deze factoren het ‘’level of conern’’ verhogen. Deze inschatting wil ik
+uiteindelijk nog wel goed testen, mogelijk dat dit nog iets moet worden aangepast.
+Op deze manier kan AI gaan redeneren met de verschillende factoren.
+-donker rood: verhoogd het risico met 60%
+-rood: verhoogd het risico met 40%
+-oranje: verhoogd het risico met 30%
+-geel: verhoogd het risico met 10%
+
+AI redeneren voor bepalen ‘’level of concern’’ voor Cauda Equina Syndroom
+(CES)
+Interpretatie vanuit vraag 5: Ja, dit verhoogd sterk het ‘’level of conern’’ op CES
+Interpretatie vanuit vraag 6: Ja, dit verhoogd het ‘’level of concern’’ op CES
+
+Interpretatie vanuit vraag 7: Ja, dit verhoogd laag het ‘’level of concern’’ op CES, ook
+enorm passend bij LRS
+Interpretatie vanuit vraag 7.1: Ja, dit verhoogd laag het ‘’level of concern’’ op CES,
+ook enorm passend bij LRS
+Interpretatie vanuit vraag 7.2: Ja, dit verhoogd laag het ‘’level of concern’’ op CES,
+ook enorm passend bij LRS
+Interpretatie vanuit vraag 7.3: Ja, dit verhoogd laag het ‘’level of concern’’ op CES,
+ook enorm passend bij LRS
+Interpretatie vanuit demografische gegevens: risico op CES neemt toe:
+-Bij leeftijd &lt; 50 jaar + obesitas
+-Recent rugoperatie ondergaan
+
+AI kan aan de hand van deze vragen en eventuele vervolgvragen in combinatie met
+de demografische gegevens gaan redeneren. Ik heb een inschatting gemaakt over in
+welke mate deze factoren het ‘’level of conern’’ verhogen. Deze inschatting wil ik
+uiteindelijk nog wel goed testen, mogelijk dat dit nog iets moet worden aangepast.
+Op deze manier kan AI gaan redeneren met de verschillende factoren.
+-donker rood: verhoogd het risico met 60%
+-rood: verhoogd het risico met 40%
+-oranje: verhoogd het risico met 30%
+-geel: verhoogd het risico met 20%
+-licht geel: verhoogd het risico met 7.5%
+
+AI redeneren voor bepalen ‘’level of concern’’ voor Spinale Infectie
+Interpretatie vanuit vraag 3.1: Ja, recent koorts gehad kan duiden op een spinale
+infectie dus verhoogd het level of conern op spinale infectie
+
+Interpretatie vanuit vraag 4.1: Ja, niet-mechanische pijn tijdens slaap is een
+symptoom van meerdere rode vlaggen waaronder ook van een spinale infectie. Bij
+aanwezigheid verhoogd het level of conern op spinale infectie
+Demografische gegevens:
+-recent spinale operatie (hoogste risico factor op spinale infectie)
+-intraveneus medicatiegebruik
+-immunosupressie medicatie
+-obesitas
+-auto-immuunziekten
+-recent in een Tuberculose land geweest (vragen we nog nergens)
+AI kan aan de hand van deze vragen en eventuele vervolgvragen in combinatie met
+de demografische gegevens gaan redeneren. Ik heb een inschatting gemaakt over in
+welke mate deze factoren het ‘’level of conern’’ verhogen. Deze inschatting wil ik
+uiteindelijk nog wel goed testen, mogelijk dat dit nog iets moet worden aangepast.
+Op deze manier kan AI gaan redeneren met de verschillende factoren.
+-donker rood: verhoogd het risico met 60%
+-rood: verhoogd het risico met 40%
+-oranje: verhoogd het risico met 30%
+-geel: verhoogd het risico met 20%
+-licht geel: verhoogd het risico met 7.5%
+
+AI redeneren voor bepalen ‘’level of concern’’ voor Axiale SpA (ziekte van
+Bechterew)
+Interpretatie vraag 2: ja, in combinatie met demografische gegevens (leeftijd &lt;45
+jaar) met aanhoudende rugpijn &gt; 3 maanden.
+Interpretatie vraag 4: nachtelijke pijn aanwezig
+Interpretatie vraag 4.1: ja, nachtelijke pijn kan verbeteren met bewegen
+
+Interpretatie vraag 8.1: Ochtendstijfheid &gt; 30 minuten is een kenmerk van Axiale SpA
+Interpretatie vraag 8.2: Axiale SpA kan erfelijk zijn
+Interpretatie vraag 8.3: deze extra-articulaire verschijnselen kunnen tekenen zijn die
+horen bij de diagnose Axiale SpA: per aanwezig symptoom verhoogd dit de kans met
+10% (let op ‘’geen van bovenstaande’’ moet niet geteld worden als +10% natuurlijk)
+Interpretatie vraag 8.4: Axiale SpA verbetert vaak met beweging (in tegenstelling tot
+mechanische rugklachten die vaak erger worden met bepaalde bewegingen)
+Interpretatie vraag 8.5: Een snelle en goede respons op NSAIDs is een klassiek
+diagnostisch criterium voor axiale SpA, terwijl dit bij andere vormen vaan
+aanhoudende rugpijn vaak niet meer helpt
+AI kan aan de hand van deze vragen en eventuele vervolgvragen in combinatie met
+de demografische gegevens gaan redeneren. Ik heb een inschatting gemaakt over in
+welke mate deze factoren het ‘’level of conern’’ verhogen. Deze inschatting wil ik
+uiteindelijk nog wel goed testen, mogelijk dat dit nog iets moet worden aangepast.
+Op deze manier kan AI gaan redeneren met de verschillende factoren.
+-donker rood: verhoogd het risico met 60%
+-rood: verhoogd het risico met 40%
+-oranje: verhoogd het risico met 30%
+-geel: verhoogd het risico met 20%
+-licht geel: verhoogd het risico met 10%
+
+AI redeneren voor bepalen ‘’van de waarschijnlijkheid’’ op Lumbosacraal
+Radiculair Syndroom (LRS)
+*Dit is dus geen ‘’ernstige’’ rode vlag, maar wel belangrijk dat we deze eruit halen in
+de triage omdat LRS een andere benadering (behandeling) vraagt dan aspecifieke
+lage rugpijn. In dit geval geven we dus niet het ‘’level of concern’’ aan, LRS is in
+principe niet bedreigend maar geven we de ‘’waarschijnlijkheid op LRS’’ aan.
+Interpretatie vraag 7: uitstralende pijn voorbij de knie of beenpijn staat meer op de
+voorgrond dan rugpijn is een typisch symptoom van LRS
+Interpretatie vraag 7.1: typisch symptoom van LRS
+
+Interpretatie vraag 7.2: typisch symptoom van LRS
+Interpretatie vraag 7.3: krachtsverlies of gevoelloosheid kan een symptoom van LRS
+zijn
+Interpretatie 7.3.1.: wanneer patiënt één van de bovenste 4 antwoorden aankruist
+dan is het alsnog een rode vlag -&gt; directe doorverwijzing naar huisarts aanbevolen.
+Interpretatie vraag 7.4: overgevoeligheid voor lichte aanraking of koud/warmte kan
+een symptoom van LRS zijn
+Interpretatie vraag 7.5: klachtentoename bij druk verhogende activiteiten is een
+typisch kenmerk van LRS
+AI kan aan de hand van deze vragen een inschatting maken van de
+waarschijnlijkheid op LRS. Ik heb een inschatting gemaakt over in welke mate
+antwoord op deze vragen de waarschijnlijkheid op LRS verhogen. Deze inschatting
+wil ik uiteindelijk nog wel goed testen, mogelijk dat dit nog iets moet worden
+aangepast. Op deze manier kan AI gaan redeneren met de verschillende factoren.
+-rood: verhoogd de waarschijnlijkheid op LRS met 40%
+-geel: verhoogd de waarschijnlijkheid op LRS met 10%
+*7.3.1. -&gt; bij een positief antwoord betekent dit alsnog een rode vlag en doorsturen
+naar de huisarts.
+
+
+That is the current infromation.
+
+Furthermore, I want to have a test option with a set of prefilled answers in the questions and also a way/view or something to see the evaluation. So one is the questions for the client and the other is the evaluation view for the fysiotherapist
+
+ But first, Feel free to first ask my any relevant questions to help me better in making an application for this. 
+
+Extra info for questions/answers:
+
+User Flow:
+Should the client/patient fill out the questions in a step-by-step (wizard) format, or should all questions be visible at once?
+First version is more to check with the fysiotherapist to brainstorm on which questions. So for now all questions visible at one
+Should the evaluation for the physiotherapist be shown immediately after the client submits, or is it a separate view/page?
+I guess seaprate viewpage, but I want to be able to view the evaluation but also change some answers to view the evaluation change easily.
+
+Data Handling:
+Do you want to store the answers locally (in state only), or should I prepare for backend/API integration (e.g., saving to a database)?
+Yes locally for now. Do api/backend later
+Should the evaluation logic (AI reasoning) be implemented in the frontend for now, or do you plan to move it to a backend service later?
+Do reasoning in the  frontend for now.
+Test Option:
+
+Should the test option (prefilled answers) be accessible via a button (e.g., "Load test data") for both the client and the physiotherapist, or only for development/testing purposes?
+Development testing purposes
+Languages:
+
+Should I prepare the app for future multi-language support (i18n), or is Dutch-only sufficient for now?
+Dutch only
+Design:
+Do you want a sidebar or navigation for switching between the client view and the evaluation view, or should it be a single-page toggle?
+Not sure, but should be very quick and easy as I want to change (some) answers and quickly see new evaluation
+Any specific branding/colors, or just use default shadcn/tailwind styles for now? No
+Accessibility:
+Are there any accessibility requirements (e.g., screen reader support, keyboard navigation)?No
