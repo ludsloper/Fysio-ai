@@ -5,8 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function App() {
-	const [apiKey, setApiKey] = useState<string>(localStorage.getItem('gemini_api_key') || 'AIzaSyDRTP15ymx_sURrOpmjiOX_5W-yHNWrykU');
+	const ky =  'AIzaSyDRTP15ymx_sURrOpmjiOX_5W-yHNWrykU';
+	const [started, setStarted] = useState<boolean>(false);
 
+	
+	const start = () => {
+		setStarted(true);
+	};
+
+	if (!started) {
+		return (
+			<div className="mx-auto max-w-md p-6 space-y-4">
+				<h1 className="text-2xl font-semibold">Fysio Intake</h1>
+				<Button onClick={start}>Start</Button>
+			</div>
+		);
+	}
 
 	// if (!started) {
 	// 	return (
@@ -19,5 +33,5 @@ export default function App() {
 	// 	);
 	// }
 
-	return <QuestionsView apiKey={apiKey} />;
+	return <QuestionsView ky={ky} />;
 }

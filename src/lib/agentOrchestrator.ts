@@ -149,7 +149,7 @@ export const functionDeclarations = [
 ] as unknown as FunctionDeclaration[];
 
 export interface OrchestratorInitOptions {
-  apiKey: string; // client-side for now
+  ky: string; // client-side for now
   model?: string; // default gemini-2.5-flash
 }
 
@@ -158,7 +158,7 @@ export class AgentOrchestrator {
   private model: string;
 
   constructor(opts: OrchestratorInitOptions) {
-  this.ai = new GoogleGenAI({ apiKey: opts.apiKey });
+  this.ai = new GoogleGenAI({ apiKey: opts.ky });
     this.model = opts.model || 'gemini-2.5-flash';
   }
 

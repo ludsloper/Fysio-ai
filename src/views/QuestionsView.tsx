@@ -8,7 +8,7 @@ import { AgentOrchestrator } from '@/lib/agentOrchestrator';
 import type { AgentMessage, AgentState, AnswerValue, PatienceMode, Patience } from '@/types/agent';
 
 type Props = {
-  apiKey: string;
+  ky: string;
 };
 
 function nowISO() { return new Date().toISOString(); }
@@ -21,7 +21,7 @@ function nowISO() { return new Date().toISOString(); }
 //   URL.revokeObjectURL(url);
 // }
 
-export default function QuestionsView({ apiKey }: Props) {
+export default function QuestionsView({ ky }: Props) {
   const [patienceMode, setPatienceMode] = useState<PatienceMode>('normal');
   const budgets = { short: 8, normal: 15, deep: 25 } as const;
   const [state, setState] = useState<AgentState>(() => ({
@@ -36,7 +36,7 @@ export default function QuestionsView({ apiKey }: Props) {
   const orchestratorRef = useRef<AgentOrchestrator | null>(null);
 
   useEffect(() => {
-    const orch = new AgentOrchestrator({ apiKey, model: 'gemini-2.5-flash' });
+    const orch = new AgentOrchestrator({ ky, model: 'gemini-2.5-flash' });
     orchestratorRef.current = orch;
     const sys = orch.getSystemMessage();
     const initMessages: AgentMessage[] = [sys];
@@ -46,7 +46,7 @@ export default function QuestionsView({ apiKey }: Props) {
     // Kick off first question with explicit state
     void askNext({ messages: initMessages, answers: {}, patience: initPatience });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiKey]);
+  }, [ky]);
 
   useEffect(() => {
     setState(s => ({ ...s, patience: { ...s.patience, mode: patienceMode, budget: budgets[patienceMode] } }));
