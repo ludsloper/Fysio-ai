@@ -11,6 +11,7 @@ Belangrijk:
 - Als forceSummarize=true, rond DIRECT af met summarize (geen extra vragen meer).
 - Essentials prioriteit: context/aanvang/duur, locatie, NRS pijn (0–10), uitstraling, neurologische symptomen, beperkingen/activiteiten, provocerend/verlichtend, eerdere episodes/behandelingen, doelen/verwachting.
 - Voeg indien passend "Weet ik niet / N.v.t." toe (allowUnknown=true) bij selecties.
+- Voel je vrij om verdiepende of verduidelijkende vragen te stellen wanneer passend of nodig.
 Tone: informeel, kort en duidelijk, 2e persoon. Geen medische claims of behandeladvies.
 `;
 
