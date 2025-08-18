@@ -1,6 +1,19 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import type { FunctionDeclaration } from '@google/genai';
-import type { AgentMessage, AgentOutcome, Patience, ToolCall, ToolName, ToolArgs } from '@/types/agent';
+import type {
+  AgentMessage,
+  AgentOutcome,
+  AgentState,
+  Patience,
+  ToolCall,
+  ToolName,
+  ToolArgs,
+  SelectArgs,
+  MultiSelectArgs,
+  NumberArgs,
+  PainScaleArgs,
+  AnswerValue,
+} from '@/types/agent';
 
 // System prompt in Dutch with guardrails and essentials
 const SYSTEM_PROMPT = `Je bent een vriendelijke digitale fysio-assistent (casual NL) voor intake bij lage rugklachten. Specificeer vragen aan de hand van de onderrug klacht.
@@ -210,6 +223,72 @@ export class AgentOrchestrator {
 
     return { type: 'ended', reason: 'Geen output.' } as AgentOutcome;
   }
+
+  // Generate a plausible answer for the current tool-call using the LLM
+  async proposeAnswer(toolCall: ToolCall, messages: AgentMessage[], answers: Record<string, unknown>): Promise<{ value: AnswerValue; note?: string }> {
+    const transcript = buildTranscript(messages);
+    const args = toolCall.args as ToolArgs;
+    const guide = `Je simuleert een cliënt die intakevragen beantwoordt. Geef een realistisch en consistent antwoord als JSON.
+Antwoord ALLEEN met JSON (geen uitleg), volgens:
+{ "value": <waarde>, "note"?: <korte toelichting> }
+Type regels:
+- ask_yesno: value is boolean
+- ask_select: value is string uit opties (of "unknown" indien allowUnknown passend)
+- ask_multiselect: value is array van strings uit opties (of ["unknown"]) 
+- ask_number: value is number binnen min/max (indien gegeven)
+- ask_pain_scale: value is integer tussen min/max (default 0..10)
+- ask_text: value is korte string (max 140)
+Wees consistent met eerdere antwoorden.`;
+    const payload = `${guide}\n\nVraag (tool):\n${JSON.stringify({ name: toolCall.name, args }, null, 2)}\n\nBekende antwoorden:\n${JSON.stringify(answers, null, 2)}\n\nLogboek tot nu (Q/A):\n${transcript}`;
+    const raw = await this.ai.models.generateContent({ model: this.model, contents: payload });
+    const text = (raw as unknown as { text?: string }).text ?? '';
+    const parsed = extractFirstJson<{ value: AnswerValue; note?: string }>(text);
+    if (!parsed || typeof parsed !== 'object' || !('value' in parsed)) {
+      const fb = fallbackAnswer(toolCall);
+      return { value: fb.value as AnswerValue, note: fb.note };
+    }
+    return parsed;
+  }
+
+  // Run the full flow automatically: keep asking next and answer via LLM until summary/ended
+  async autoComplete(
+    init: { messages: AgentMessage[]; answers: Record<string, AnswerValue>; patience: Patience },
+    opts?: { maxSteps?: number }
+  ): Promise<AgentState> {
+    const maxSteps = opts?.maxSteps ?? 200;
+    let messages = [...init.messages];
+    let answers = { ...init.answers } as Record<string, AnswerValue>;
+    let patience = { ...init.patience } as Patience;
+  const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+    for (let step = 0; step < maxSteps; step++) {
+      const outcome = await this.next(messages, answers, patience, patience.asked >= patience.budget || patience.wrapUp ? { forceSummarize: true } : undefined);
+      if (outcome.type === 'question') {
+        const toolCall = outcome.toolCall;
+        const askMsg: AgentMessage = { role: 'assistant', toolCall, timestamp: new Date().toISOString() };
+        messages = [...messages, askMsg];
+    // Rate limiting: wait 5s before generating each new answer
+    console.log("Next questions, sleeping 5secs");
+    await sleep(5000);
+        const { value, note } = await this.proposeAnswer(toolCall, messages, answers);
+        // Build tool result
+        const { id, key } = toolCall.args as ToolArgs;
+        const answeredAt = new Date().toISOString();
+        const toolMsg: AgentMessage = {
+          role: 'tool',
+          toolResult: { id, key, value, askedAt: askMsg.timestamp, answeredAt, notes: note },
+          timestamp: answeredAt,
+        };
+        messages = [...messages, toolMsg];
+        answers = { ...answers, [key]: value, ...(note ? { [`${key}.extra_note`]: note } : {}) };
+        patience = { ...patience, asked: patience.asked + 1 };
+        continue;
+      }
+      // summary or ended
+      return { messages, answers, patience, outcome } as AgentState;
+    }
+    return { messages, answers, patience, outcome: { type: 'ended', reason: 'Max steps reached' } } as AgentState;
+  }
 }
 
 // Format a transcript from the message history, pairing each assistant toolCall
@@ -243,3 +322,43 @@ function formatValue(v: unknown): string {
 }
 
 // (Answers map remains available in UI state; transcript is derived from messages.)
+
+// Extract JSON helper
+function extractFirstJson<T>(text: string): T | null {
+  if (!text) return null;
+  const fence = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  const body = fence ? fence[1] : text;
+  const start = body.indexOf('{');
+  const end = body.lastIndexOf('}');
+  if (start === -1 || end === -1 || end <= start) return null;
+  try { return JSON.parse(body.slice(start, end + 1)) as T; } catch { return null; }
+}
+
+function fallbackAnswer(toolCall: ToolCall): { value: unknown; note?: string } {
+  const args = toolCall.args as ToolArgs;
+  switch (toolCall.name) {
+    case 'ask_yesno':
+      return { value: true };
+    case 'ask_select': {
+      const sel = args as SelectArgs;
+      const opts = sel.options ?? [];
+      return { value: opts[0]?.value ?? (sel.allowUnknown ? 'unknown' : '') };
+    }
+    case 'ask_multiselect': {
+      const mul = args as MultiSelectArgs;
+      const opts = mul.options ?? [];
+      return { value: opts.length ? [opts[0].value] : (mul.allowUnknown ? ['unknown'] : []) };
+    }
+    case 'ask_number':
+    case 'ask_pain_scale': {
+      const num = (toolCall.name === 'ask_number' ? (args as NumberArgs) : (args as PainScaleArgs));
+      const min = typeof num.min === 'number' ? num.min : 0;
+      const max = typeof num.max === 'number' ? num.max : 10;
+      return { value: Math.round((min + max) / 2) };
+    }
+    case 'ask_text':
+      return { value: 'n.v.t.' };
+    default:
+      return { value: '' };
+  }
+}
