@@ -9,8 +9,7 @@ Belangrijk:
 - Géén vrije tekst teruggeven; alle stappen lopen via function calls.
 - Respecteer geduld: als wrapUp=true of budget bijna op is, stel maximaal nog 3 essentiële vragen en rond af met summarize.
 - Als forceSummarize=true, rond DIRECT af met summarize (geen extra vragen meer).
-- Essentials prioriteit: context/aanvang/duur, locatie, NRS pijn (0–10), uitstraling, neurologische symptomen, beperkingen/activiteiten, provocerend/verlichtend, eerdere episodes/behandelingen, doelen/verwachting.
-- Voeg indien passend "Weet ik niet / N.v.t." toe (allowUnknown=true) bij selecties.
+- Essentials prioriteit: context/aanvang/duur, triage, locatie, NRS pijn (0–10), uitstraling, neurologische symptomen, beperkingen/activiteiten, provocerend/verlichtend, eerdere episodes/behandelingen, doelen/verwachting, psychosociaal, rode vlaggen en LRS
 - Voel je vrij om verdiepende of verduidelijkende vragen te stellen wanneer passend of nodig.
 Tone: informeel, kort en duidelijk, 2e persoon. Geen medische claims of behandeladvies.
 `;
@@ -168,18 +167,16 @@ export class AgentOrchestrator {
   }
 
   async next(
-    messages: AgentMessage[],
-    answers: Record<string, unknown>,
+  messages: AgentMessage[],
+  _answers: Record<string, unknown>,
     patience: Patience,
     opts?: { forceSummarize?: boolean; extraNote?: string }
   ): Promise<AgentOutcome> {
-    // Compact state-only input to save tokens (no textual transcript)
-    const compact = compactAnswers(answers);
-    const patienceLine = `Patience: mode=${patience.mode}, budget=${patience.budget}, asked=${patience.asked}, wrapUp=${patience.wrapUp}`;
-    const last = getLastTurn(messages);
-    const lastLine = last ? `Laatste vraag: ${last.label} | Antwoord: ${typeof last.value === 'string' ? last.value : JSON.stringify(last.value)}` : '';
+  // Build a readable transcript of all Q&A (with optional notes), like the logbook view
+  const patienceLine = `Patience: mode=${patience.mode}, budget=${patience.budget}, asked=${patience.asked}, wrapUp=${patience.wrapUp}`;
   const forceLine = opts?.forceSummarize ? 'forceSummarize=true' : '';
-  const content = `${patienceLine}\n${forceLine}\n${lastLine}\nAntwoorden (JSON): ${JSON.stringify(compact)}`;
+  const transcript = buildTranscript(messages);
+  const content = `${patienceLine}\n${forceLine}\n\nGesprekslog (vragen en antwoorden):\n${transcript}`;
 
   const raw = await this.ai.models.generateContent({
       model: this.model,
@@ -215,42 +212,34 @@ export class AgentOrchestrator {
   }
 }
 
-// Remove empty values from answers for token efficiency
-function compactAnswers(obj: Record<string, unknown>): Record<string, unknown> {
-  const out: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(obj)) {
-    if (v === '' || v === null || v === undefined) continue;
-    if (Array.isArray(v)) {
-      if (v.length === 0) continue;
-      out[k] = v;
-    } else if (typeof v === 'object') {
-      const nested = compactAnswers(v as Record<string, unknown>);
-      if (Object.keys(nested).length > 0) out[k] = nested;
-    } else {
-      out[k] = v;
-    }
-  }
-  return out;
-}
-
-function getLastTurn(messages: AgentMessage[]): { label: string; value: unknown } | undefined {
-  // Find last assistant toolCall and its subsequent tool result
-  for (let i = messages.length - 1; i >= 0; i--) {
+// Format a transcript from the message history, pairing each assistant toolCall
+// with its corresponding toolResult answer. Includes optional notes.
+function buildTranscript(messages: AgentMessage[]): string {
+  const lines: string[] = [];
+  for (let i = 0; i < messages.length; i++) {
     const m = messages[i];
-    if (m.role === 'tool' && m.toolResult) {
-      // find preceding assistant call for label
-      for (let j = i - 1; j >= 0; j--) {
-        const a = messages[j];
-        if (a.role === 'assistant' && a.toolCall) {
-          const args = a.toolCall.args as unknown as { label?: string };
-          return { label: args?.label || a.toolCall.name, value: m.toolResult.value };
-        }
+    if (m.role === 'assistant' && m.toolCall) {
+      const args = m.toolCall.args as unknown as { id: string; label?: string };
+      const qLabel = args?.label || m.toolCall.name;
+      const answerMsg = messages.find(mm => mm.role === 'tool' && mm.toolResult && mm.toolResult.id === args.id);
+      const val = answerMsg?.toolResult?.value as unknown;
+      const notes = answerMsg?.toolResult?.notes;
+      const formattedValue = formatValue(val);
+      lines.push(`- Vraag: ${qLabel}`);
+      lines.push(`  Antwoord: ${formattedValue}`);
+      if (notes && String(notes).trim() !== '') {
+        lines.push(`  Opmerking: ${notes}`);
       }
-      return { label: 'Antwoord', value: m.toolResult.value };
     }
   }
-  return undefined;
+  return lines.join('\n');
 }
 
-// Collect latest note per answer key from the tool results history
-// Notes are folded into answers via dotted keys (e.g., "onderrug.locatie.extra_note").
+function formatValue(v: unknown): string {
+  if (Array.isArray(v)) return v.join(', ');
+  if (typeof v === 'boolean') return v ? 'Ja' : 'Nee';
+  if (v === undefined || v === null || v === '') return '—';
+  return String(v);
+}
+
+// (Answers map remains available in UI state; transcript is derived from messages.)
