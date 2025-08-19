@@ -15,17 +15,21 @@ import type {
   AnswerValue,
 } from '@/types/agent';
 
+
+
+export const DEFAULT_PERSONALIZED_PROMPT = `- Essentials prioriteit: context/aanvang/duur, triage, locatie, NRS pijn (0–10), uitstraling, neurologische symptomen, beperkingen/activiteiten, provocerend/verlichtend, eerdere episodes/behandelingen, doelen/verwachting, psychosociaal, rode vlaggen en LRS
+- Voel je vrij om verdiepende of verduidelijkende vragen te stellen wanneer passend of nodig.
+Tone: informeel, kort en duidelijk, 2e persoon. Geen medische claims of behandeladvies.`
 // System prompt in Dutch with guardrails and essentials
-const SYSTEM_PROMPT = `Je bent een vriendelijke digitale fysio-assistent (casual NL) voor intake bij lage rugklachten. Specificeer vragen aan de hand van de onderrug klacht.
+function makeSystemPrompt(personalized: string) {
+  return `Je bent een vriendelijke digitale fysio-assistent (casual NL) voor intake bij lage rugklachten. Specificeer vragen aan de hand van de onderrug klacht.
 Belangrijk:
 - Gebruik ALTIJD precies één functie-aanroep (function call) per beurt: voor vragen gebruik ask_*; voor afronden gebruik summarize.
 - Géén vrije tekst teruggeven; alle stappen lopen via function calls.
 - Respecteer geduld: als wrapUp=true of budget bijna op is, stel maximaal nog 3 essentiële vragen en rond af met summarize.
 - Als forceSummarize=true, rond DIRECT af met summarize (geen extra vragen meer).
-- Essentials prioriteit: context/aanvang/duur, triage, locatie, NRS pijn (0–10), uitstraling, neurologische symptomen, beperkingen/activiteiten, provocerend/verlichtend, eerdere episodes/behandelingen, doelen/verwachting, psychosociaal, rode vlaggen en LRS
-- Voel je vrij om verdiepende of verduidelijkende vragen te stellen wanneer passend of nodig.
-Tone: informeel, kort en duidelijk, 2e persoon. Geen medische claims of behandeladvies.
-`;
+` + personalized;
+}
 
 // Function declarations for Gemini tool calling
 export const functionDeclarations = [
@@ -164,19 +168,22 @@ export const functionDeclarations = [
 export interface OrchestratorInitOptions {
   ky: string; // client-side for now
   model?: string; // default gemini-2.5-flash
+  personalizedSystemPrompt?: string; // optional override for system behavior
 }
 
 export class AgentOrchestrator {
   private ai: GoogleGenAI;
   private model: string;
+  private systemPrompt: string;
 
   constructor(opts: OrchestratorInitOptions) {
   this.ai = new GoogleGenAI({ apiKey: opts.ky });
     this.model = opts.model || 'gemini-2.5-flash';
+    this.systemPrompt = makeSystemPrompt(opts.personalizedSystemPrompt ?? DEFAULT_PERSONALIZED_PROMPT);
   }
 
   getSystemMessage(): AgentMessage {
-    return { role: 'system', content: SYSTEM_PROMPT, timestamp: new Date().toISOString() };
+  return { role: 'system', content: this.systemPrompt, timestamp: new Date().toISOString() };
   }
 
   async next(
@@ -193,7 +200,7 @@ export class AgentOrchestrator {
 
   const raw = await this.ai.models.generateContent({
       model: this.model,
-      contents: `${SYSTEM_PROMPT}\n\n${content}`,
+  contents: `${this.systemPrompt}\n\n${content}`,
       config: {
         tools: [{ functionDeclarations }],
       },

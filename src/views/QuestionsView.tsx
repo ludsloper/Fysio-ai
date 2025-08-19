@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TextInputQuestion, NumberInputQuestion, SelectQuestion, MultiSelectQuestion, YesNoQuestion, PainScale } from '@/components';
-import { AgentOrchestrator } from '@/lib/agentOrchestrator';
+import { AgentOrchestrator, DEFAULT_PERSONALIZED_PROMPT } from '@/lib/agentOrchestrator';
 import type { AgentMessage, AgentState, AnswerValue, PatienceMode, Patience } from '@/types/agent';
 
 type Props = {
@@ -23,7 +23,10 @@ function nowISO() { return new Date().toISOString(); }
 
 export default function QuestionsView({ ky }: Props) {
   const [patienceMode, setPatienceMode] = useState<PatienceMode>('normal');
-  const budgets = { short: 8, normal: 15, deep: 25 } as const;
+  const budgets = { short: 8, normal: 15, deep: 25, x35: 35, x45: 45 } as const;
+  const [personalizedPrompt, setPersonalizedPrompt] = useState<string>(DEFAULT_PERSONALIZED_PROMPT);
+  const [showPromptDialog, setShowPromptDialog] = useState<boolean>(false);
+  const [promptDraft, setPromptDraft] = useState<string>(DEFAULT_PERSONALIZED_PROMPT);
   const [state, setState] = useState<AgentState>(() => ({
     messages: [],
     answers: {},
@@ -36,7 +39,7 @@ export default function QuestionsView({ ky }: Props) {
   const orchestratorRef = useRef<AgentOrchestrator | null>(null);
 
   useEffect(() => {
-    const orch = new AgentOrchestrator({ ky, model: 'gemini-2.5-flash' });
+    const orch = new AgentOrchestrator({ ky, model: 'gemini-2.5-flash', personalizedSystemPrompt: personalizedPrompt });
     orchestratorRef.current = orch;
     const sys = orch.getSystemMessage();
     const initMessages: AgentMessage[] = [sys];
@@ -46,12 +49,18 @@ export default function QuestionsView({ ky }: Props) {
     // Kick off first question with explicit state
     void askNext({ messages: initMessages, answers: {}, patience: initPatience });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ky]);
+  }, [ky, personalizedPrompt]);
 
   useEffect(() => {
     setState(s => ({ ...s, patience: { ...s.patience, mode: patienceMode, budget: budgets[patienceMode] } }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patienceMode]);
+
+  // Keep the draft in sync when opening the dialog
+  useEffect(() => {
+    if (showPromptDialog) setPromptDraft(personalizedPrompt);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showPromptDialog]);
 
   function persist() {
     localStorage.setItem('intake_state', JSON.stringify(state));
@@ -166,16 +175,50 @@ export default function QuestionsView({ ky }: Props) {
               <SelectItem value="short">Kort (±8)</SelectItem>
               <SelectItem value="normal">Normaal (±15)</SelectItem>
               <SelectItem value="deep">Diep (±25)</SelectItem>
+              <SelectItem value="uitgebreid">Uitgebreid (±35)</SelectItem>
+              <SelectItem value="maximaal">Maximaal (±45)</SelectItem>
             </SelectContent>
           </Select>
           {/* <Button variant="outline" onClick={handleWrapUp}>Minder vragen</Button> */}
           <Button variant="outline" onClick={() => setShowLog(v => !v)}>{showLog ? 'Verberg log' : 'Toon log'}</Button>
+          <Button variant="outline" onClick={() => setShowPromptDialog(true)}>AI instructies</Button>
           {/* <Button variant="outline" onClick={() => fileDownload(`intake_snapshot_${Date.now()}.json`, state)} title="Download log">
             <Download className="h-4 w-4 mr-2"/> Export
           </Button> */}
         </div>
         <div className="text-xs text-muted-foreground">Vragen gesteld: {state.patience.asked} (richtlijn: ±{state.patience.budget}) {state.patience.wrapUp && '· afronden gewenst'}</div>
       </Card>
+
+      {showPromptDialog && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="ai-instructies-title"
+          onKeyDown={(e) => { if (e.key === 'Escape') setShowPromptDialog(false); }}
+        >
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowPromptDialog(false)} />
+          <div className="relative z-10 w-full max-w-lg rounded-lg border border-border bg-background p-4 shadow-lg" onClick={(e) => e.stopPropagation()}>
+            <h2 id="ai-instructies-title" className="text-base font-semibold mb-2">AI instructies</h2>
+            <div className="space-y-2">
+              <Label htmlFor="personalized-prompt" className="text-xs text-muted-foreground">Aanvullende toon/regels</Label>
+              <textarea
+                id="personalized-prompt"
+                className="w-full min-h-32 rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none"
+                placeholder="Aanvullende toon/regels voor de assistent"
+                value={promptDraft}
+                onChange={(e) => setPromptDraft(e.target.value)}
+                rows={8}
+              />
+              <div className="text-[11px] text-muted-foreground">Opslaan start een nieuwe sessie.</div>
+            </div>
+            <div className="mt-4 flex items-center justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowPromptDialog(false)}>Annuleren</Button>
+              <Button onClick={() => { setPersonalizedPrompt(promptDraft); setShowPromptDialog(false); }}>Opslaan</Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {currentTool && (
         <Card className="p-4 space-y-4">

@@ -1,0 +1,713 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "Je bent een vriendelijke digitale fysio-assistent (casual NL) voor intake bij lage rugklachten. Specificeer vragen aan de hand van de onderrug klacht.\nBelangrijk:\n- Gebruik ALTIJD precies één functie-aanroep (function call) per beurt: voor vragen gebruik ask_*; voor afronden gebruik summarize.\n- Géén vrije tekst teruggeven; alle stappen lopen via function calls.\n- Respecteer geduld: als wrapUp=true of budget bijna op is, stel maximaal nog 3 essentiële vragen en rond af met summarize.\n- Als forceSummarize=true, rond DIRECT af met summarize (geen extra vragen meer).\n- Essentials prioriteit: context/aanvang/duur, triage, locatie, NRS pijn (0–10), uitstraling, neurologische symptomen, beperkingen/activiteiten, provocerend/verlichtend, eerdere episodes/behandelingen, doelen/verwachting, psychosociaal, rode vlaggen en LRS\n- Voel je vrij om verdiepende of verduidelijkende vragen te stellen wanneer passend of nodig.\nTone: informeel, kort en duidelijk, 2e persoon. Geen medische claims of behandeladvies.\n",
+      "timestamp": "2025-08-18T14:20:24.624Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "label": "Wanneer is je lage rugpijn begonnen?",
+          "id": "q_start_pain",
+          "key": "startPain"
+        }
+      },
+      "timestamp": "2025-08-18T14:20:36.010Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "q_start_pain",
+        "key": "startPain",
+        "value": "Ongeveer twee weken geleden.",
+        "askedAt": "2025-08-18T14:20:36.010Z",
+        "answeredAt": "2025-08-18T14:20:38.351Z"
+      },
+      "timestamp": "2025-08-18T14:20:38.351Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "id": "pain_location",
+          "label": "Waar zit de pijn precies in je lage rug?",
+          "key": "pain_location"
+        }
+      },
+      "timestamp": "2025-08-18T14:20:50.188Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_location",
+        "key": "pain_location",
+        "value": "Het zit vooral rechts, net boven mijn bil.",
+        "askedAt": "2025-08-18T14:20:50.188Z",
+        "answeredAt": "2025-08-18T14:20:53.052Z"
+      },
+      "timestamp": "2025-08-18T14:20:53.052Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_pain_scale",
+        "args": {
+          "min": 0,
+          "id": "pain_scale_01",
+          "key": "pain_intensity",
+          "max": 10,
+          "label": "Hoe erg is de pijn op dit moment? Geef een cijfer van 0 (geen pijn) tot 10 (ergst denkbare pijn)."
+        }
+      },
+      "timestamp": "2025-08-18T14:21:05.088Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_scale_01",
+        "key": "pain_intensity",
+        "value": 7,
+        "askedAt": "2025-08-18T14:21:05.088Z",
+        "answeredAt": "2025-08-18T14:21:07.104Z",
+        "notes": "Het wisselt wat, maar nu voelt het wel zo erg."
+      },
+      "timestamp": "2025-08-18T14:21:07.104Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "key": "pain_radiation",
+          "label": "Heb je ook uitstraling van de pijn naar je been of voet?",
+          "id": "pain_radiation"
+        }
+      },
+      "timestamp": "2025-08-18T14:21:18.361Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_radiation",
+        "key": "pain_radiation",
+        "value": true,
+        "askedAt": "2025-08-18T14:21:18.361Z",
+        "answeredAt": "2025-08-18T14:21:22.843Z",
+        "notes": "Ja, het straalt een beetje uit naar mijn rechterbil."
+      },
+      "timestamp": "2025-08-18T14:21:22.843Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "neurologische_symptomen_vraag",
+          "label": "Heb je ook last van tintelingen, gevoelloosheid of zwakte in je been of voet?",
+          "key": "neurologische_symptomen"
+        }
+      },
+      "timestamp": "2025-08-18T14:21:34.828Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "neurologische_symptomen_vraag",
+        "key": "neurologische_symptomen",
+        "value": false,
+        "askedAt": "2025-08-18T14:21:34.828Z",
+        "answeredAt": "2025-08-18T14:21:39.410Z"
+      },
+      "timestamp": "2025-08-18T14:21:39.410Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "label": "Zijn er bepaalde bewegingen of activiteiten die de pijn erger maken?",
+          "id": "provocation_activities",
+          "key": "provocation_activities"
+        }
+      },
+      "timestamp": "2025-08-18T14:21:50.804Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "provocation_activities",
+        "key": "provocation_activities",
+        "value": "Ja, lang zitten maakt het erger, en ook als ik buk of iets probeer op te tillen.",
+        "askedAt": "2025-08-18T14:21:50.804Z",
+        "answeredAt": "2025-08-18T14:21:53.405Z"
+      },
+      "timestamp": "2025-08-18T14:21:53.405Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "key": "alleviating_factors",
+          "id": "alleviating_factors",
+          "label": "Zijn er ook dingen die de pijn juist minder maken?"
+        }
+      },
+      "timestamp": "2025-08-18T14:22:06.193Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "alleviating_factors",
+        "key": "alleviating_factors",
+        "value": "Als ik even ga liggen wordt het minder, en warmte helpt soms ook.",
+        "askedAt": "2025-08-18T14:22:06.193Z",
+        "answeredAt": "2025-08-18T14:22:09.365Z"
+      },
+      "timestamp": "2025-08-18T14:22:09.365Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "key": "previous_episodes",
+          "label": "Heb je dit soort rugklachten vaker gehad?",
+          "id": "q_previous_episodes"
+        }
+      },
+      "timestamp": "2025-08-18T14:22:22.131Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "q_previous_episodes",
+        "key": "previous_episodes",
+        "value": false,
+        "askedAt": "2025-08-18T14:22:22.131Z",
+        "answeredAt": "2025-08-18T14:22:25.755Z",
+        "notes": "Nee, dit is de eerste keer dat ik zoiets heb."
+      },
+      "timestamp": "2025-08-18T14:22:25.755Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "key": "beperkingen_activiteiten",
+          "label": "Welke dagelijkse activiteiten zijn nu moeilijk door de pijn?",
+          "id": "limitation_activities"
+        }
+      },
+      "timestamp": "2025-08-18T14:22:38.928Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "limitation_activities",
+        "key": "beperkingen_activiteiten",
+        "value": "Vooral bukken of iets van de grond pakken. Ook langere tijd zitten is lastig, en simpele dingen als mijn schoenen aantrekken.",
+        "askedAt": "2025-08-18T14:22:38.928Z",
+        "answeredAt": "2025-08-18T14:22:42.447Z"
+      },
+      "timestamp": "2025-08-18T14:22:42.447Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "label": "Heb je problemen met plassen of je ontlasting, of voel je je gevoelloos rond je billen of genitaliën?",
+          "key": "bladderBowelChanges",
+          "id": "redFlagQuestion1"
+        }
+      },
+      "timestamp": "2025-08-18T14:22:55.299Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "redFlagQuestion1",
+        "key": "bladderBowelChanges",
+        "value": false,
+        "askedAt": "2025-08-18T14:22:55.299Z",
+        "answeredAt": "2025-08-18T14:22:57.371Z"
+      },
+      "timestamp": "2025-08-18T14:22:57.371Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "id": "expectations_goals",
+          "label": "Wat hoop je met de fysiotherapie te bereiken, of wat zijn je verwachtingen van het herstel?",
+          "key": "expectations_goals"
+        }
+      },
+      "timestamp": "2025-08-18T14:23:10.663Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "expectations_goals",
+        "key": "expectations_goals",
+        "value": "Ik hoop vooral dat de pijn minder wordt, en dat ik weer normaal kan bewegen, vooral bukken en zitten zonder pijn. Ik wil gewoon weer mijn dagelijkse dingen kunnen doen.",
+        "askedAt": "2025-08-18T14:23:10.663Z",
+        "answeredAt": "2025-08-18T14:23:12.715Z"
+      },
+      "timestamp": "2025-08-18T14:23:12.715Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "label": "Heb je gemerkt dat stress of je stemming invloed heeft op je pijn?",
+          "id": "stress_impact",
+          "key": "stress_impact"
+        }
+      },
+      "timestamp": "2025-08-18T14:23:25.789Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "stress_impact",
+        "key": "stress_impact",
+        "value": true,
+        "askedAt": "2025-08-18T14:23:25.789Z",
+        "answeredAt": "2025-08-18T14:23:28.121Z",
+        "notes": "Ja, als ik me druk maak of gestrest ben, voel ik de pijn vaak sterker."
+      },
+      "timestamp": "2025-08-18T14:23:28.121Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "q13",
+          "key": "recent_trauma",
+          "label": "Heb je recentelijk een val of ongeluk gehad die mogelijk de rugpijn heeft veroorzaakt of verergerd?"
+        }
+      },
+      "timestamp": "2025-08-18T14:23:46.089Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "q13",
+        "key": "recent_trauma",
+        "value": false,
+        "askedAt": "2025-08-18T14:23:46.089Z",
+        "answeredAt": "2025-08-18T14:23:47.585Z"
+      },
+      "timestamp": "2025-08-18T14:23:47.585Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "label": "Staat de pijn ook uit naar je been of voet?",
+          "key": "radiation_leg_foot",
+          "id": "radiation_leg_foot"
+        }
+      },
+      "timestamp": "2025-08-18T14:24:03.383Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "radiation_leg_foot",
+        "key": "radiation_leg_foot",
+        "value": true,
+        "askedAt": "2025-08-18T14:24:03.383Z",
+        "answeredAt": "2025-08-18T14:24:05.765Z",
+        "notes": "Ja, het straalt een beetje uit naar mijn rechterbil."
+      },
+      "timestamp": "2025-08-18T14:24:05.765Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_select",
+        "args": {
+          "key": "pain_pattern",
+          "options": [
+            {
+              "label": "De pijn is constant aanwezig",
+              "value": "constant"
+            },
+            {
+              "value": "intermittent",
+              "label": "De pijn komt en gaat"
+            },
+            {
+              "value": "worse_morning",
+              "label": "De pijn is erger in de ochtend"
+            },
+            {
+              "value": "worse_evening",
+              "label": "De pijn is erger in de avond"
+            },
+            {
+              "value": "no_pattern",
+              "label": "De pijn heeft geen vast patroon"
+            }
+          ],
+          "label": "Hoe is het verloop van de pijn gedurende een dag?",
+          "id": "pain_pattern"
+        }
+      },
+      "timestamp": "2025-08-18T14:24:26.627Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_pattern",
+        "key": "pain_pattern",
+        "value": "intermittent",
+        "askedAt": "2025-08-18T14:24:26.627Z",
+        "answeredAt": "2025-08-18T14:24:33.328Z",
+        "notes": "Het hangt sterk af van mijn activiteiten; bij beweging wordt het erger, en als ik rustiger ben of lig, neemt het af."
+      },
+      "timestamp": "2025-08-18T14:24:33.328Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "fearAvoidance",
+          "key": "fearAvoidance",
+          "label": "Vermijd je bepaalde bewegingen of activiteiten uit angst dat de pijn erger wordt?"
+        }
+      },
+      "timestamp": "2025-08-18T14:24:51.061Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "fearAvoidance",
+        "key": "fearAvoidance",
+        "value": true,
+        "askedAt": "2025-08-18T14:24:51.061Z",
+        "answeredAt": "2025-08-18T14:24:54.726Z",
+        "notes": "Ja, ik probeer bukken en tillen te vermijden, want dan wordt de pijn erger."
+      },
+      "timestamp": "2025-08-18T14:24:54.726Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "sleep_impact",
+          "key": "sleep_impact",
+          "label": "Wordt je slaap beïnvloed door de pijn?"
+        }
+      },
+      "timestamp": "2025-08-18T14:25:12.424Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "sleep_impact",
+        "key": "sleep_impact",
+        "value": true,
+        "askedAt": "2025-08-18T14:25:12.424Z",
+        "answeredAt": "2025-08-18T14:25:15.870Z",
+        "notes": "Ja, ik word er soms wakker van."
+      },
+      "timestamp": "2025-08-18T14:25:15.870Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "rug_beweeglijkheid_achter_zij",
+          "key": "rug_beweeglijkheid_achter_zij",
+          "label": "Kun je je rug zonder veel moeite naar achteren buigen of zijwaarts bewegen?"
+        }
+      },
+      "timestamp": "2025-08-18T14:25:34.605Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "rug_beweeglijkheid_achter_zij",
+        "key": "rug_beweeglijkheid_achter_zij",
+        "value": false,
+        "askedAt": "2025-08-18T14:25:34.605Z",
+        "answeredAt": "2025-08-18T14:25:38.156Z",
+        "notes": "Nee, dat is lastig en pijnlijk."
+      },
+      "timestamp": "2025-08-18T14:25:38.156Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "label": "Heeft de pijn ook invloed op je werk of hobby's?",
+          "id": "impact_work_hobbies",
+          "key": "impact_work_hobbies"
+        }
+      },
+      "timestamp": "2025-08-18T14:25:52.839Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "impact_work_hobbies",
+        "key": "impact_work_hobbies",
+        "value": true,
+        "askedAt": "2025-08-18T14:25:52.839Z",
+        "answeredAt": "2025-08-18T14:25:57.799Z",
+        "notes": "Ja, mijn werk bestaat grotendeels uit zittende taken, en dat is nu erg lastig. Ook mijn hobby, tuinieren, is nu beperkt."
+      },
+      "timestamp": "2025-08-18T14:25:57.799Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "redFlagGeneralHealth",
+          "key": "redFlagGeneralHealth",
+          "label": "Voel je je ook algemeen onwel, heb je koorts of onverklaarbaar gewichtsverlies?"
+        }
+      },
+      "timestamp": "2025-08-18T14:26:13.345Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "redFlagGeneralHealth",
+        "key": "redFlagGeneralHealth",
+        "value": false,
+        "askedAt": "2025-08-18T14:26:13.345Z",
+        "answeredAt": "2025-08-18T14:26:15.230Z"
+      },
+      "timestamp": "2025-08-18T14:26:15.230Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "morningStiffness",
+          "key": "morningStiffness",
+          "label": "Heb je last van ochtendstijfheid in je rug?"
+        }
+      },
+      "timestamp": "2025-08-18T14:26:31.388Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "morningStiffness",
+        "key": "morningStiffness",
+        "value": true,
+        "askedAt": "2025-08-18T14:26:31.388Z",
+        "answeredAt": "2025-08-18T14:26:34.130Z",
+        "notes": "Ja, vooral als ik opsta na lang liggen voelt het stijf aan."
+      },
+      "timestamp": "2025-08-18T14:26:34.130Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "key": "morning_stiffness_duration",
+          "label": "Hoe lang duurt die ochtendstijfheid meestal voordat het minder wordt?",
+          "id": "morning_stiffness_duration"
+        }
+      },
+      "timestamp": "2025-08-18T14:26:55.649Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "morning_stiffness_duration",
+        "key": "morning_stiffness_duration",
+        "value": "Ongeveer een half uur",
+        "askedAt": "2025-08-18T14:26:55.649Z",
+        "answeredAt": "2025-08-18T14:26:57.829Z"
+      },
+      "timestamp": "2025-08-18T14:26:57.829Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "medication_use",
+          "key": "medication_use",
+          "label": "Gebruik je medicatie tegen de pijn of voor andere aandoeningen?"
+        }
+      },
+      "timestamp": "2025-08-18T14:27:17.058Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "medication_use",
+        "key": "medication_use",
+        "value": true,
+        "askedAt": "2025-08-18T14:27:17.058Z",
+        "answeredAt": "2025-08-18T14:27:18.566Z",
+        "notes": "Ja, ik neem paracetamol als de pijn te erg wordt."
+      },
+      "timestamp": "2025-08-18T14:27:18.566Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_select",
+        "args": {
+          "key": "paracetamol_effect",
+          "label": "Hoe effectief is de paracetamol die je neemt tegen de pijn?",
+          "id": "paracetamol_effect",
+          "options": [
+            {
+              "value": "not_at_all",
+              "label": "Helemaal niet"
+            },
+            {
+              "value": "a_little",
+              "label": "Een beetje"
+            },
+            {
+              "label": "Redelijk",
+              "value": "reasonable"
+            },
+            {
+              "label": "Voldoende",
+              "value": "sufficient"
+            },
+            {
+              "label": "Heel goed",
+              "value": "very_good"
+            }
+          ]
+        }
+      },
+      "timestamp": "2025-08-18T14:27:44.479Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "paracetamol_effect",
+        "key": "paracetamol_effect",
+        "value": "a_little",
+        "askedAt": "2025-08-18T14:27:44.479Z",
+        "answeredAt": "2025-08-18T14:27:46.216Z",
+        "notes": "Het neemt de ergste scherpte eraf, maar de pijn blijft aanwezig."
+      },
+      "timestamp": "2025-08-18T14:27:46.216Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "key": "standingWalkingDuration",
+          "label": "Hoelang kun je comfortabel staan of lopen voordat de pijn toeneemt?",
+          "id": "standingWalkingDuration"
+        }
+      },
+      "timestamp": "2025-08-18T14:28:02.058Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "standingWalkingDuration",
+        "key": "standingWalkingDuration",
+        "value": "Ongeveer 10-15 minuten",
+        "askedAt": "2025-08-18T14:28:02.058Z",
+        "answeredAt": "2025-08-18T14:28:04.678Z",
+        "notes": "Daarna wordt de pijn in mijn rug en bil te veel."
+      },
+      "timestamp": "2025-08-18T14:28:04.678Z"
+    }
+  ],
+  "answers": {
+    "startPain": "Ongeveer twee weken geleden.",
+    "pain_location": "Het zit vooral rechts, net boven mijn bil.",
+    "pain_intensity": 7,
+    "pain_intensity.extra_note": "Het wisselt wat, maar nu voelt het wel zo erg.",
+    "pain_radiation": true,
+    "pain_radiation.extra_note": "Ja, het straalt een beetje uit naar mijn rechterbil.",
+    "neurologische_symptomen": false,
+    "provocation_activities": "Ja, lang zitten maakt het erger, en ook als ik buk of iets probeer op te tillen.",
+    "alleviating_factors": "Als ik even ga liggen wordt het minder, en warmte helpt soms ook.",
+    "previous_episodes": false,
+    "previous_episodes.extra_note": "Nee, dit is de eerste keer dat ik zoiets heb.",
+    "beperkingen_activiteiten": "Vooral bukken of iets van de grond pakken. Ook langere tijd zitten is lastig, en simpele dingen als mijn schoenen aantrekken.",
+    "bladderBowelChanges": false,
+    "expectations_goals": "Ik hoop vooral dat de pijn minder wordt, en dat ik weer normaal kan bewegen, vooral bukken en zitten zonder pijn. Ik wil gewoon weer mijn dagelijkse dingen kunnen doen.",
+    "stress_impact": true,
+    "stress_impact.extra_note": "Ja, als ik me druk maak of gestrest ben, voel ik de pijn vaak sterker.",
+    "recent_trauma": false,
+    "radiation_leg_foot": true,
+    "radiation_leg_foot.extra_note": "Ja, het straalt een beetje uit naar mijn rechterbil.",
+    "pain_pattern": "intermittent",
+    "pain_pattern.extra_note": "Het hangt sterk af van mijn activiteiten; bij beweging wordt het erger, en als ik rustiger ben of lig, neemt het af.",
+    "fearAvoidance": true,
+    "fearAvoidance.extra_note": "Ja, ik probeer bukken en tillen te vermijden, want dan wordt de pijn erger.",
+    "sleep_impact": true,
+    "sleep_impact.extra_note": "Ja, ik word er soms wakker van.",
+    "rug_beweeglijkheid_achter_zij": false,
+    "rug_beweeglijkheid_achter_zij.extra_note": "Nee, dat is lastig en pijnlijk.",
+    "impact_work_hobbies": true,
+    "impact_work_hobbies.extra_note": "Ja, mijn werk bestaat grotendeels uit zittende taken, en dat is nu erg lastig. Ook mijn hobby, tuinieren, is nu beperkt.",
+    "redFlagGeneralHealth": false,
+    "morningStiffness": true,
+    "morningStiffness.extra_note": "Ja, vooral als ik opsta na lang liggen voelt het stijf aan.",
+    "morning_stiffness_duration": "Ongeveer een half uur",
+    "medication_use": true,
+    "medication_use.extra_note": "Ja, ik neem paracetamol als de pijn te erg wordt.",
+    "paracetamol_effect": "a_little",
+    "paracetamol_effect.extra_note": "Het neemt de ergste scherpte eraf, maar de pijn blijft aanwezig.",
+    "standingWalkingDuration": "Ongeveer 10-15 minuten",
+    "standingWalkingDuration.extra_note": "Daarna wordt de pijn in mijn rug en bil te veel."
+  },
+  "patience": {
+    "mode": "normal",
+    "budget": 25,
+    "asked": 25,
+    "wrapUp": false
+  },
+  "outcome": {
+    "type": "summary",
+    "summary": {
+      "reportText": "De lage rugpijn begon ongeveer twee weken geleden. De pijn bevindt zich voornamelijk aan de rechterkant, net boven de bil, en straalt een beetje uit naar de rechterbil. De huidige pijnscore is 7 op een schaal van 0 tot 10, hoewel dit kan variëren. Er is geen sprake van tintelingen, gevoelloosheid of zwakte in het been of de voet.\n\nActiviteiten die de pijn verergeren zijn lang zitten, bukken en iets optillen. De pijn vermindert bij liggen en met warmte. Dit is de eerste keer dat deze persoon dergelijke rugklachten ervaart. Dagelijkse activiteiten die nu moeilijk zijn, zijn vooral bukken, iets van de grond pakken, langere tijd zitten en schoenen aantrekken. Er zijn geen problemen met plassen of ontlasting, noch gevoelloosheid rond de billen of genitaliën.\n\nDe verwachting van fysiotherapie is vermindering van pijn en het weer normaal kunnen bewegen, specifiek bukken en zitten zonder pijn, en het hervatten van dagelijkse activiteiten. Stress en stemming hebben invloed op de pijn; bij stress voelt de pijn vaak sterker. Er is geen recente val of ongeluk geweest.\n\nHet verloop van de pijn gedurende de dag is intermitterend en sterk afhankelijk van activiteiten; bij beweging wordt het erger, bij rust of liggen neemt het af. Bukken en tillen worden vermeden uit angst voor pijnverergering. Slaap wordt beïnvloed; de persoon wordt soms wakker van de pijn. Het is lastig en pijnlijk om de rug naar achteren te buigen of zijwaarts te bewegen. De pijn beïnvloedt werk (zittende taken) en hobby's (tuinieren). Er zijn geen algemene ziektesymptomen zoals koorts of onverklaarbaar gewichtsverlies.\n\nEr is sprake van ochtendstijfheid in de rug, vooral bij het opstaan na lang liggen, die ongeveer een half uur aanhoudt. Paracetamol wordt gebruikt als pijnmedicatie, wat de ergste scherpte eraf neemt, maar de pijn blijft aanwezig. Comfortabel staan of lopen kan ongeveer 10-15 minuten voordat de pijn in de rug en bil te veel wordt.",
+      "highlights": [
+        "Lage rugpijn sinds twee weken, rechts boven bil met uitstraling naar rechterbil.",
+        "Huidige pijnscore 7/10.",
+        "Pijn neemt toe bij lang zitten, bukken, tillen; vermindert bij liggen en warmte.",
+        "Eerste episode van dergelijke rugklachten.",
+        "Beperkingen in dagelijkse activiteiten (bukken, zitten, schoenen aantrekken) en werk/hobby (zittend werk, tuinieren).",
+        "Pijn wordt beïnvloed door stress/stemming.",
+        "Intermitterend pijnverloop, vermijdt bukken en tillen.",
+        "Slaap wordt beïnvloed; ochtendstijfheid (~30 min).",
+        "Beperkte mobiliteit van de rug (achterover/zijwaarts buigen).",
+        "Paracetamol biedt enige verlichting.",
+        "Comfortabel staan/lopen max 10-15 minuten."
+      ],
+      "redFlags": [],
+      "missingEssentials": []
+    }
+  },
+  "exportedAt": "2025-08-18T14:28:27.061Z"
+}

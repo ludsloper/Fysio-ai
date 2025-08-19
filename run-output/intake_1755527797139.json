@@ -1,0 +1,645 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "Je bent een vriendelijke digitale fysio-assistent (casual NL) voor intake bij lage rugklachten. Specificeer vragen aan de hand van de onderrug klacht.\nBelangrijk:\n- Gebruik ALTIJD precies één functie-aanroep (function call) per beurt: voor vragen gebruik ask_*; voor afronden gebruik summarize.\n- Géén vrije tekst teruggeven; alle stappen lopen via function calls.\n- Respecteer geduld: als wrapUp=true of budget bijna op is, stel maximaal nog 3 essentiële vragen en rond af met summarize.\n- Als forceSummarize=true, rond DIRECT af met summarize (geen extra vragen meer).\n- Essentials prioriteit: context/aanvang/duur, triage, locatie, NRS pijn (0–10), uitstraling, neurologische symptomen, beperkingen/activiteiten, provocerend/verlichtend, eerdere episodes/behandelingen, doelen/verwachting, psychosociaal, rode vlaggen en LRS\n- Voel je vrij om verdiepende of verduidelijkende vragen te stellen wanneer passend of nodig.\nTone: informeel, kort en duidelijk, 2e persoon. Geen medische claims of behandeladvies.\n",
+      "timestamp": "2025-08-18T14:28:27.196Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "label": "Wanneer is je pijn begonnen?",
+          "key": "pain_onset",
+          "id": "pain_onset"
+        }
+      },
+      "timestamp": "2025-08-18T14:28:39.128Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_onset",
+        "key": "pain_onset",
+        "value": "Afgelopen week",
+        "askedAt": "2025-08-18T14:28:39.128Z",
+        "answeredAt": "2025-08-18T14:28:40.964Z"
+      },
+      "timestamp": "2025-08-18T14:28:40.964Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "id": "painLocation",
+          "key": "painLocation",
+          "label": "Waar zit de pijn precies? Wijs het eens aan op je rug."
+        }
+      },
+      "timestamp": "2025-08-18T14:28:52.552Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "painLocation",
+        "key": "painLocation",
+        "value": "Rechts onderin mijn rug, net boven mijn heup.",
+        "askedAt": "2025-08-18T14:28:52.552Z",
+        "answeredAt": "2025-08-18T14:28:57.122Z"
+      },
+      "timestamp": "2025-08-18T14:28:57.122Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_pain_scale",
+        "args": {
+          "anchors": [
+            "Geen pijn",
+            "Ergst denkbare pijn"
+          ],
+          "key": "painIntensity",
+          "min": 0,
+          "id": "pain_intensity",
+          "max": 10,
+          "label": "Hoe erg is de pijn op dit moment? Geef een cijfer tussen 0 (geen pijn) en 10 (ergst denkbare pijn)."
+        }
+      },
+      "timestamp": "2025-08-18T14:29:08.848Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_intensity",
+        "key": "painIntensity",
+        "value": 7,
+        "askedAt": "2025-08-18T14:29:08.848Z",
+        "answeredAt": "2025-08-18T14:29:10.264Z",
+        "notes": "Het wisselt wat, maar nu is het wel flink aanwezig."
+      },
+      "timestamp": "2025-08-18T14:29:10.264Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "pain_radiation",
+          "key": "pain_radiation",
+          "label": "Straalt de pijn uit naar je bil of been?"
+        }
+      },
+      "timestamp": "2025-08-18T14:29:23.069Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_radiation",
+        "key": "pain_radiation",
+        "value": true,
+        "askedAt": "2025-08-18T14:29:23.069Z",
+        "answeredAt": "2025-08-18T14:29:25.844Z",
+        "notes": "Ja, het trekt door naar mijn rechterbil."
+      },
+      "timestamp": "2025-08-18T14:29:25.844Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "key": "neurologicalSymptoms",
+          "id": "neurologicalSymptoms",
+          "label": "Voel je ook tintelingen, gevoelloosheid of spierzwakte in je been?"
+        }
+      },
+      "timestamp": "2025-08-18T14:29:40.157Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "neurologicalSymptoms",
+        "key": "neurologicalSymptoms",
+        "value": false,
+        "askedAt": "2025-08-18T14:29:40.157Z",
+        "answeredAt": "2025-08-18T14:29:43.442Z",
+        "notes": "Nee, dat voel ik niet in mijn been. Alleen de pijn in mijn bil."
+      },
+      "timestamp": "2025-08-18T14:29:43.442Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "id": "provocerendVerlichtend",
+          "label": "Zijn er bewegingen of activiteiten die de pijn erger maken, of juist minder?",
+          "key": "provocerendVerlichtend"
+        }
+      },
+      "timestamp": "2025-08-18T14:29:57.188Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "provocerendVerlichtend",
+        "key": "provocerendVerlichtend",
+        "value": "Lang zitten of bukken maakt het erger. Als ik even ga liggen, wordt het iets beter.",
+        "askedAt": "2025-08-18T14:29:57.188Z",
+        "answeredAt": "2025-08-18T14:30:00.180Z"
+      },
+      "timestamp": "2025-08-18T14:30:00.180Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "q_red_flag_bowel_bladder",
+          "label": "Heb je moeite met plassen of de controle over je darmen?",
+          "key": "red_flag_bowel_bladder"
+        }
+      },
+      "timestamp": "2025-08-18T14:30:14.777Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "q_red_flag_bowel_bladder",
+        "key": "red_flag_bowel_bladder",
+        "value": false,
+        "askedAt": "2025-08-18T14:30:14.777Z",
+        "answeredAt": "2025-08-18T14:30:18.206Z"
+      },
+      "timestamp": "2025-08-18T14:30:18.206Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "key": "daily_impact",
+          "label": "Hoe beïnvloedt de pijn je dagelijkse bezigheden, zoals werk, sport of huishoudelijke taken?",
+          "id": "daily_impact"
+        }
+      },
+      "timestamp": "2025-08-18T14:30:31.594Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "daily_impact",
+        "key": "daily_impact",
+        "value": "Zitten op het werk is lastig, ik moet regelmatig opstaan. Sporten lukt nu niet en huishoudelijke taken zoals stofzuigen of iets van de grond pakken zijn erg pijnlijk.",
+        "askedAt": "2025-08-18T14:30:31.594Z",
+        "answeredAt": "2025-08-18T14:30:35.031Z"
+      },
+      "timestamp": "2025-08-18T14:30:35.031Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "previous_episodes",
+          "label": "Heb je eerder last gehad van lage rugpijn of hiervoor behandeld?",
+          "key": "previous_episodes"
+        }
+      },
+      "timestamp": "2025-08-18T14:30:47.804Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "previous_episodes",
+        "key": "previous_episodes",
+        "value": true,
+        "askedAt": "2025-08-18T14:30:47.804Z",
+        "answeredAt": "2025-08-18T14:30:51.004Z",
+        "notes": "Ja, een paar jaar geleden ook wel eens, maar toen was het minder erg."
+      },
+      "timestamp": "2025-08-18T14:30:51.004Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "label": "Wat hoop je met deze begeleiding te bereiken? Wat zijn je doelen of verwachtingen?",
+          "key": "goals_expectations",
+          "id": "goals_expectations"
+        }
+      },
+      "timestamp": "2025-08-18T14:31:02.391Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "goals_expectations",
+        "key": "goals_expectations",
+        "value": "Ik hoop dat de pijn snel minder wordt, zodat ik weer normaal kan werken en sporten. En ik wil graag begrijpen waarom ik hier nu weer last van heb, en wat ik kan doen om het in de toekomst te voorkomen.",
+        "askedAt": "2025-08-18T14:31:02.391Z",
+        "answeredAt": "2025-08-18T14:31:05.081Z"
+      },
+      "timestamp": "2025-08-18T14:31:05.081Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "key": "psychosocial_health",
+          "label": "Hoe zit het met je algemene gezondheid of stress op dit moment? Denk je dat dit invloed heeft op je klachten?",
+          "id": "psychosocial_health_id"
+        }
+      },
+      "timestamp": "2025-08-18T14:31:23.373Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "psychosocial_health_id",
+        "key": "psychosocial_health",
+        "value": "Ja, ik heb de laatste tijd wel wat meer stress door mijn werk.",
+        "askedAt": "2025-08-18T14:31:23.373Z",
+        "answeredAt": "2025-08-18T14:31:28.906Z",
+        "notes": "Ik heb wel het idee dat dit me kwetsbaarder maakt voor de klachten, of dat ze erger worden als ik gestrest ben."
+      },
+      "timestamp": "2025-08-18T14:31:28.906Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "q12",
+          "label": "Heb je de laatste tijd ook last van koorts, onverklaarbaar gewichtsverlies of ben je bekend met een ernstige ziekte?",
+          "key": "red_flags_general"
+        }
+      },
+      "timestamp": "2025-08-18T14:31:43.223Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "q12",
+        "key": "red_flags_general",
+        "value": false,
+        "askedAt": "2025-08-18T14:31:43.223Z",
+        "answeredAt": "2025-08-18T14:31:45.361Z"
+      },
+      "timestamp": "2025-08-18T14:31:45.361Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "key": "radiating_leg",
+          "helpText": "Soms straalt pijn vanuit de rug uit naar de bil en zelfs het been. Ik wil graag weten hoe ver de pijn precies gaat.",
+          "label": "Trekt de pijn verder dan je bil, bijvoorbeeld je been in?",
+          "id": "radiating_leg"
+        }
+      },
+      "timestamp": "2025-08-18T14:32:01.750Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "radiating_leg",
+        "key": "radiating_leg",
+        "value": false,
+        "askedAt": "2025-08-18T14:32:01.750Z",
+        "answeredAt": "2025-08-18T14:32:04.520Z",
+        "notes": "Nee, het blijft in mijn bil."
+      },
+      "timestamp": "2025-08-18T14:32:04.520Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_select",
+        "args": {
+          "options": [
+            {
+              "value": "sudden",
+              "label": "Plotseling"
+            },
+            {
+              "label": "Geleidelijk",
+              "value": "gradual"
+            }
+          ],
+          "id": "onset_type",
+          "key": "onset_type",
+          "label": "Hoe is de pijn begonnen? Was het plotseling, of is het geleidelijk erger geworden?"
+        }
+      },
+      "timestamp": "2025-08-18T14:32:21.741Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "onset_type",
+        "key": "onset_type",
+        "value": "gradual",
+        "askedAt": "2025-08-18T14:32:21.741Z",
+        "answeredAt": "2025-08-18T14:32:25.238Z"
+      },
+      "timestamp": "2025-08-18T14:32:25.238Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_number",
+        "args": {
+          "unit": "minuten",
+          "label": "Hoe lang kun je ongeveer achter elkaar zitten voordat de pijn erger wordt?",
+          "id": "sitting_duration",
+          "key": "sitting_duration_before_pain"
+        }
+      },
+      "timestamp": "2025-08-18T14:32:39.313Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "sitting_duration",
+        "key": "sitting_duration_before_pain",
+        "value": 20,
+        "askedAt": "2025-08-18T14:32:39.313Z",
+        "answeredAt": "2025-08-18T14:32:41.052Z",
+        "notes": "Daarna wordt het ongemakkelijk en moet ik echt even bewegen of opstaan."
+      },
+      "timestamp": "2025-08-18T14:32:41.052Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_select",
+        "args": {
+          "options": [
+            {
+              "label": "Zeurend",
+              "value": "aching"
+            },
+            {
+              "value": "stabbing",
+              "label": "Stekend"
+            },
+            {
+              "label": "Branderig",
+              "value": "burning"
+            },
+            {
+              "label": "Drukkend",
+              "value": "pressure"
+            },
+            {
+              "value": "other",
+              "label": "Anders"
+            }
+          ],
+          "id": "pain_character",
+          "key": "pain_character",
+          "label": "Hoe zou je de pijn omschrijven?"
+        }
+      },
+      "timestamp": "2025-08-18T14:33:05.128Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_character",
+        "key": "pain_character",
+        "value": "aching",
+        "askedAt": "2025-08-18T14:33:05.128Z",
+        "answeredAt": "2025-08-18T14:33:08.465Z"
+      },
+      "timestamp": "2025-08-18T14:33:08.465Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "question-17",
+          "key": "coughing_sneezing_straining",
+          "label": "Maakt hoesten, niezen of persen de pijn erger?"
+        }
+      },
+      "timestamp": "2025-08-18T14:33:26.917Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "question-17",
+        "key": "coughing_sneezing_straining",
+        "value": true,
+        "askedAt": "2025-08-18T14:33:26.917Z",
+        "answeredAt": "2025-08-18T14:33:29.109Z",
+        "notes": "Ja, vooral hoesten en niezen geven dan een scherpe steek."
+      },
+      "timestamp": "2025-08-18T14:33:29.109Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "pain_radiation_cough_sneeze",
+          "label": "Schiet de scherpe pijn bij hoesten of niezen ook door naar je been?",
+          "key": "pain_radiation_cough_sneeze"
+        }
+      },
+      "timestamp": "2025-08-18T14:33:44.864Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_radiation_cough_sneeze",
+        "key": "pain_radiation_cough_sneeze",
+        "value": false,
+        "askedAt": "2025-08-18T14:33:44.864Z",
+        "answeredAt": "2025-08-18T14:33:47.481Z"
+      },
+      "timestamp": "2025-08-18T14:33:47.481Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "id": "painAtRestOrNight",
+          "key": "painAtRestOrNight",
+          "label": "Heb je ook pijn als je rust, bijvoorbeeld 's nachts of als je ligt?"
+        }
+      },
+      "timestamp": "2025-08-18T14:34:07.693Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "painAtRestOrNight",
+        "key": "painAtRestOrNight",
+        "value": true,
+        "askedAt": "2025-08-18T14:34:07.693Z",
+        "answeredAt": "2025-08-18T14:34:16.637Z",
+        "notes": "Ja, al is het dan wel minder erg dan overdag. Soms word ik er wel van wakker als ik verkeerd lig."
+      },
+      "timestamp": "2025-08-18T14:34:16.637Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_select",
+        "args": {
+          "id": "pain_buttock_quality",
+          "label": "Hoe voelt de pijn precies in je bil?",
+          "key": "painButtockQuality",
+          "options": [
+            {
+              "label": "Meer een doffe, zeurende pijn",
+              "value": "dull_aching"
+            },
+            {
+              "label": "Meer een scherpe, stekende of brandende pijn",
+              "value": "sharp_stabbing_burning"
+            }
+          ]
+        }
+      },
+      "timestamp": "2025-08-18T14:34:39.833Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_buttock_quality",
+        "key": "painButtockQuality",
+        "value": "dull_aching",
+        "askedAt": "2025-08-18T14:34:39.833Z",
+        "answeredAt": "2025-08-18T14:34:43.091Z"
+      },
+      "timestamp": "2025-08-18T14:34:43.091Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_number",
+        "args": {
+          "unit": "min",
+          "id": "walking_standing_limit",
+          "label": "Hoe lang kun je ongeveer achter elkaar staan of lopen voordat de pijn erger wordt?",
+          "key": "walking_standing_limit"
+        }
+      },
+      "timestamp": "2025-08-18T14:35:00.655Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "walking_standing_limit",
+        "key": "walking_standing_limit",
+        "value": 30,
+        "askedAt": "2025-08-18T14:35:00.655Z",
+        "answeredAt": "2025-08-18T14:35:03.363Z",
+        "notes": "Daarna begint het ook wel lastig te worden, dan moet ik echt even gaan zitten of liggen."
+      },
+      "timestamp": "2025-08-18T14:35:03.363Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "label": "Ben je destijds voor je rugklachten behandeld en zo ja, wat voor behandeling was dat en hielp het?",
+          "key": "previous_treatment_effectiveness",
+          "id": "previous_treatment_effectiveness"
+        }
+      },
+      "timestamp": "2025-08-18T14:35:26.453Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "previous_treatment_effectiveness",
+        "key": "previous_treatment_effectiveness",
+        "value": "Ja, ik ben toen even naar de huisarts geweest. Die gaf me wat oefeningen en advies. Het hielp toen wel voldoende, omdat de pijn minder hevig was dan nu. Het zakte uiteindelijk vanzelf weer af.",
+        "askedAt": "2025-08-18T14:35:26.453Z",
+        "answeredAt": "2025-08-18T14:35:30.691Z"
+      },
+      "timestamp": "2025-08-18T14:35:30.691Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "label": "Hoe is de pijn als je slaapt? Word je er vaak wakker van, of zijn er bepaalde slaapposities die de pijn erger maken?",
+          "key": "night_pain_details",
+          "id": "night_pain_details"
+        }
+      },
+      "timestamp": "2025-08-18T14:35:59.211Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "night_pain_details",
+        "key": "night_pain_details",
+        "value": "Het is minder erg dan overdag, maar ja, ik word er wel eens wakker van. Vooral als ik op mijn rechterzij lig, dan wordt het ongemakkelijk. Op mijn rug of linkerzij gaat het meestal wel.",
+        "askedAt": "2025-08-18T14:35:59.211Z",
+        "answeredAt": "2025-08-18T14:36:02.131Z"
+      },
+      "timestamp": "2025-08-18T14:36:02.131Z"
+    }
+  ],
+  "answers": {
+    "pain_onset": "Afgelopen week",
+    "painLocation": "Rechts onderin mijn rug, net boven mijn heup.",
+    "painIntensity": 7,
+    "painIntensity.extra_note": "Het wisselt wat, maar nu is het wel flink aanwezig.",
+    "pain_radiation": true,
+    "pain_radiation.extra_note": "Ja, het trekt door naar mijn rechterbil.",
+    "neurologicalSymptoms": false,
+    "neurologicalSymptoms.extra_note": "Nee, dat voel ik niet in mijn been. Alleen de pijn in mijn bil.",
+    "provocerendVerlichtend": "Lang zitten of bukken maakt het erger. Als ik even ga liggen, wordt het iets beter.",
+    "red_flag_bowel_bladder": false,
+    "daily_impact": "Zitten op het werk is lastig, ik moet regelmatig opstaan. Sporten lukt nu niet en huishoudelijke taken zoals stofzuigen of iets van de grond pakken zijn erg pijnlijk.",
+    "previous_episodes": true,
+    "previous_episodes.extra_note": "Ja, een paar jaar geleden ook wel eens, maar toen was het minder erg.",
+    "goals_expectations": "Ik hoop dat de pijn snel minder wordt, zodat ik weer normaal kan werken en sporten. En ik wil graag begrijpen waarom ik hier nu weer last van heb, en wat ik kan doen om het in de toekomst te voorkomen.",
+    "psychosocial_health": "Ja, ik heb de laatste tijd wel wat meer stress door mijn werk.",
+    "psychosocial_health.extra_note": "Ik heb wel het idee dat dit me kwetsbaarder maakt voor de klachten, of dat ze erger worden als ik gestrest ben.",
+    "red_flags_general": false,
+    "radiating_leg": false,
+    "radiating_leg.extra_note": "Nee, het blijft in mijn bil.",
+    "onset_type": "gradual",
+    "sitting_duration_before_pain": 20,
+    "sitting_duration_before_pain.extra_note": "Daarna wordt het ongemakkelijk en moet ik echt even bewegen of opstaan.",
+    "pain_character": "aching",
+    "coughing_sneezing_straining": true,
+    "coughing_sneezing_straining.extra_note": "Ja, vooral hoesten en niezen geven dan een scherpe steek.",
+    "pain_radiation_cough_sneeze": false,
+    "painAtRestOrNight": true,
+    "painAtRestOrNight.extra_note": "Ja, al is het dan wel minder erg dan overdag. Soms word ik er wel van wakker als ik verkeerd lig.",
+    "painButtockQuality": "dull_aching",
+    "walking_standing_limit": 30,
+    "walking_standing_limit.extra_note": "Daarna begint het ook wel lastig te worden, dan moet ik echt even gaan zitten of liggen.",
+    "previous_treatment_effectiveness": "Ja, ik ben toen even naar de huisarts geweest. Die gaf me wat oefeningen en advies. Het hielp toen wel voldoende, omdat de pijn minder hevig was dan nu. Het zakte uiteindelijk vanzelf weer af.",
+    "night_pain_details": "Het is minder erg dan overdag, maar ja, ik word er wel eens wakker van. Vooral als ik op mijn rechterzij lig, dan wordt het ongemakkelijk. Op mijn rug of linkerzij gaat het meestal wel."
+  },
+  "patience": {
+    "mode": "normal",
+    "budget": 25,
+    "asked": 23,
+    "wrapUp": false
+  },
+  "outcome": {
+    "type": "ended",
+    "reason": "Geen output."
+  },
+  "exportedAt": "2025-08-18T14:36:37.139Z"
+}

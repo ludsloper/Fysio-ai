@@ -2,7 +2,6 @@
 import { useState } from "react";
 import QuestionsView from "./views/QuestionsView.tsx";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export default function App() {
 	const ky =  'AIzaSyDRTP15ymx_sURrOpmjiOX_5W-yHNWrykU';

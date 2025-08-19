@@ -1,0 +1,381 @@
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "Je bent een vriendelijke digitale fysio-assistent (casual NL) voor intake bij lage rugklachten. Specificeer vragen aan de hand van de onderrug klacht.\nBelangrijk:\n- Gebruik ALTIJD precies één functie-aanroep (function call) per beurt: voor vragen gebruik ask_*; voor afronden gebruik summarize.\n- Géén vrije tekst teruggeven; alle stappen lopen via function calls.\n- Respecteer geduld: als wrapUp=true of budget bijna op is, stel maximaal nog 3 essentiële vragen en rond af met summarize.\n- Als forceSummarize=true, rond DIRECT af met summarize (geen extra vragen meer).\n- Essentials prioriteit: context/aanvang/duur, triage, locatie, NRS pijn (0–10), uitstraling, neurologische symptomen, beperkingen/activiteiten, provocerend/verlichtend, eerdere episodes/behandelingen, doelen/verwachting, psychosociaal, rode vlaggen en LRS\n- Voel je vrij om verdiepende of verduidelijkende vragen te stellen wanneer passend of nodig.\nTone: informeel, kort en duidelijk, 2e persoon. Geen medische claims of behandeladvies.\n",
+      "timestamp": "2025-08-18T13:47:06.953Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "label": "Wanneer is je lage rugpijn begonnen?",
+          "key": "pain_start_date",
+          "id": "context_start_date"
+        }
+      },
+      "timestamp": "2025-08-18T13:47:29.464Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "context_start_date",
+        "key": "pain_start_date",
+        "value": "Ongeveer twee weken geleden.",
+        "askedAt": "2025-08-18T13:47:29.464Z",
+        "answeredAt": "2025-08-18T13:47:31.857Z"
+      },
+      "timestamp": "2025-08-18T13:47:31.857Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "key": "painLocation",
+          "label": "Waar voel je precies de pijn in je lage rug?",
+          "id": "pain_location"
+        }
+      },
+      "timestamp": "2025-08-18T13:47:53.242Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_location",
+        "key": "painLocation",
+        "value": "Midden in mijn rug, net boven mijn billen.",
+        "askedAt": "2025-08-18T13:47:53.242Z",
+        "answeredAt": "2025-08-18T13:47:57.165Z"
+      },
+      "timestamp": "2025-08-18T13:47:57.165Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_pain_scale",
+        "args": {
+          "id": "pain_scale",
+          "key": "current_pain_intensity",
+          "anchors": [
+            "Geen pijn",
+            "Heel veel pijn"
+          ],
+          "label": "Hoe erg is de pijn op dit moment?"
+        }
+      },
+      "timestamp": "2025-08-18T13:48:20.004Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "pain_scale",
+        "key": "current_pain_intensity",
+        "value": 6,
+        "askedAt": "2025-08-18T13:48:20.004Z",
+        "answeredAt": "2025-08-18T13:48:21.690Z",
+        "notes": "Het is te doen, maar ik voel het wel continu."
+      },
+      "timestamp": "2025-08-18T13:48:21.690Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "label": "Heb je ook uitstralende pijn, bijvoorbeeld naar je benen of billen?",
+          "id": "q_uitstraling",
+          "key": "pain_radiation"
+        }
+      },
+      "timestamp": "2025-08-18T13:48:44.771Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "q_uitstraling",
+        "key": "pain_radiation",
+        "value": true,
+        "askedAt": "2025-08-18T13:48:44.771Z",
+        "answeredAt": "2025-08-18T13:48:48.199Z",
+        "notes": "Ja, soms trekt het wat door naar mijn rechterbil."
+      },
+      "timestamp": "2025-08-18T13:48:48.199Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_select",
+        "args": {
+          "id": "rad_pain_char",
+          "label": "Hoe voelt die uitstralende pijn precies? Is het meer een doffe pijn, tintelingen, of iets anders?",
+          "key": "rad_pain_char",
+          "options": [
+            {
+              "label": "Doffe pijn",
+              "value": "dull_pain"
+            },
+            {
+              "value": "sharp_pain",
+              "label": "Scherpe pijn"
+            },
+            {
+              "label": "Tintelingen",
+              "value": "tingling"
+            },
+            {
+              "label": "Gevoelloosheid",
+              "value": "numbness"
+            },
+            {
+              "label": "Branderig",
+              "value": "burning"
+            },
+            {
+              "label": "Anders, namelijk...",
+              "value": "other"
+            }
+          ]
+        }
+      },
+      "timestamp": "2025-08-18T13:49:10.129Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "rad_pain_char",
+        "key": "rad_pain_char",
+        "value": "tingling",
+        "askedAt": "2025-08-18T13:49:10.129Z",
+        "answeredAt": "2025-08-18T13:49:13.081Z"
+      },
+      "timestamp": "2025-08-18T13:49:13.081Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "key": "neurological_symptoms_numbness_weakness",
+          "id": "neurological_symptoms_numbness_weakness",
+          "label": "Voel je ook een doof gevoel of spierzwakte in je benen?"
+        }
+      },
+      "timestamp": "2025-08-18T13:49:36.077Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "neurological_symptoms_numbness_weakness",
+        "key": "neurological_symptoms_numbness_weakness",
+        "value": false,
+        "askedAt": "2025-08-18T13:49:36.077Z",
+        "answeredAt": "2025-08-18T13:49:41.974Z",
+        "notes": "Nee, alleen de tintelingen in mijn rechterbil."
+      },
+      "timestamp": "2025-08-18T13:49:41.974Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "key": "daily_activities_impact",
+          "id": "daily_activities_impact",
+          "label": "Heeft de pijn invloed op je dagelijkse activiteiten, zoals zitten, lopen of bukken? Zo ja, hoe?"
+        }
+      },
+      "timestamp": "2025-08-18T13:50:04.271Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "daily_activities_impact",
+        "key": "daily_activities_impact",
+        "value": "Ja, vooral zitten en bukken zijn lastig. Langer dan een half uur zitten doet pijn en bukken probeer ik te vermijden.",
+        "askedAt": "2025-08-18T13:50:04.271Z",
+        "answeredAt": "2025-08-18T13:50:06.851Z",
+        "notes": "Vooral zitten en bukken zijn lastig."
+      },
+      "timestamp": "2025-08-18T13:50:06.851Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "id": "provocative_palliative",
+          "key": "provocative_palliative",
+          "label": "Wat maakt de pijn erger of juist beter?"
+        }
+      },
+      "timestamp": "2025-08-18T13:50:30.714Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "provocative_palliative",
+        "key": "provocative_palliative",
+        "value": "Zitten en bukken maken het erger, vooral lang zitten. Lopen helpt soms wel een beetje, en liggen is het beste.",
+        "askedAt": "2025-08-18T13:50:30.714Z",
+        "answeredAt": "2025-08-18T13:50:33.012Z",
+        "notes": "Lang zitten en bukken zijn het ergst; liggen is het beste."
+      },
+      "timestamp": "2025-08-18T13:50:33.012Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "key": "previous_episodes",
+          "id": "previous_episodes",
+          "label": "Heb je dit soort klachten eerder gehad?"
+        }
+      },
+      "timestamp": "2025-08-18T13:50:55.716Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "previous_episodes",
+        "key": "previous_episodes",
+        "value": false,
+        "askedAt": "2025-08-18T13:50:55.716Z",
+        "answeredAt": "2025-08-18T13:50:57.895Z",
+        "notes": "Nee, dit is de eerste keer."
+      },
+      "timestamp": "2025-08-18T13:50:57.895Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "key": "cauda_equina_symptoms",
+          "id": "caudaEquinaSymptoms",
+          "label": "Heb je last van problemen met plassen of ontlasting, of een doof gevoel rond je geslachtsdelen of anus?"
+        }
+      },
+      "timestamp": "2025-08-18T13:51:23.742Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "caudaEquinaSymptoms",
+        "key": "cauda_equina_symptoms",
+        "value": false,
+        "askedAt": "2025-08-18T13:51:23.742Z",
+        "answeredAt": "2025-08-18T13:51:25.943Z"
+      },
+      "timestamp": "2025-08-18T13:51:25.943Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "key": "goals_expectations",
+          "label": "Wat zijn je doelen met fysiotherapie? Wat hoop je te bereiken?",
+          "id": "goals_expectations"
+        }
+      },
+      "timestamp": "2025-08-18T13:51:48.678Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "goals_expectations",
+        "key": "goals_expectations",
+        "value": "Ik wil graag dat de pijn in mijn rug minder wordt, zodat ik weer normaal kan zitten en bukken. Het liefst wil ik ook weer langere stukken kunnen zitten zonder die uitstraling.",
+        "askedAt": "2025-08-18T13:51:48.678Z",
+        "answeredAt": "2025-08-18T13:51:52.944Z",
+        "notes": "Vooral minder pijn en weer normaal functioneren bij zitten en bukken."
+      },
+      "timestamp": "2025-08-18T13:51:52.944Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_text",
+        "args": {
+          "id": "psychosocial_impact",
+          "label": "Hoe zit je er mentaal bij? Heeft de pijn invloed op je stemming, of ervaar je veel stress door de klachten?",
+          "key": "psychosocial_impact"
+        }
+      },
+      "timestamp": "2025-08-18T13:52:18.609Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "psychosocial_impact",
+        "key": "psychosocial_impact",
+        "value": "Het is wel frustrerend, vooral omdat ik veel zit voor werk en dat nu lastig is. Het maakt me soms wat korteraf, maar echt gestrest ben ik er niet door. Ik denk er wel veel aan.",
+        "askedAt": "2025-08-18T13:52:18.609Z",
+        "answeredAt": "2025-08-18T13:52:24.475Z",
+        "notes": "Frustratie, lichte irritatie, pijn is veel in gedachten."
+      },
+      "timestamp": "2025-08-18T13:52:24.475Z"
+    },
+    {
+      "role": "assistant",
+      "toolCall": {
+        "name": "ask_yesno",
+        "args": {
+          "helpText": "Dit helpt ons om een completer beeld te krijgen van je gezondheid.",
+          "label": "Heb je naast je rugpijn nog andere klachten, zoals koorts, onverklaarbaar gewichtsverlies, of voel je je algemeen niet lekker?",
+          "id": "red_flags_general",
+          "key": "red_flags_general"
+        }
+      },
+      "timestamp": "2025-08-18T13:52:55.911Z"
+    },
+    {
+      "role": "tool",
+      "toolResult": {
+        "id": "red_flags_general",
+        "key": "red_flags_general",
+        "value": false,
+        "askedAt": "2025-08-18T13:52:55.911Z",
+        "answeredAt": "2025-08-18T13:52:57.557Z"
+      },
+      "timestamp": "2025-08-18T13:52:57.557Z"
+    }
+  ],
+  "answers": {
+    "pain_start_date": "Ongeveer twee weken geleden.",
+    "painLocation": "Midden in mijn rug, net boven mijn billen.",
+    "current_pain_intensity": 6,
+    "current_pain_intensity.extra_note": "Het is te doen, maar ik voel het wel continu.",
+    "pain_radiation": true,
+    "pain_radiation.extra_note": "Ja, soms trekt het wat door naar mijn rechterbil.",
+    "rad_pain_char": "tingling",
+    "neurological_symptoms_numbness_weakness": false,
+    "neurological_symptoms_numbness_weakness.extra_note": "Nee, alleen de tintelingen in mijn rechterbil.",
+    "daily_activities_impact": "Ja, vooral zitten en bukken zijn lastig. Langer dan een half uur zitten doet pijn en bukken probeer ik te vermijden.",
+    "daily_activities_impact.extra_note": "Vooral zitten en bukken zijn lastig.",
+    "provocative_palliative": "Zitten en bukken maken het erger, vooral lang zitten. Lopen helpt soms wel een beetje, en liggen is het beste.",
+    "provocative_palliative.extra_note": "Lang zitten en bukken zijn het ergst; liggen is het beste.",
+    "previous_episodes": false,
+    "previous_episodes.extra_note": "Nee, dit is de eerste keer.",
+    "cauda_equina_symptoms": false,
+    "goals_expectations": "Ik wil graag dat de pijn in mijn rug minder wordt, zodat ik weer normaal kan zitten en bukken. Het liefst wil ik ook weer langere stukken kunnen zitten zonder die uitstraling.",
+    "goals_expectations.extra_note": "Vooral minder pijn en weer normaal functioneren bij zitten en bukken.",
+    "psychosocial_impact": "Het is wel frustrerend, vooral omdat ik veel zit voor werk en dat nu lastig is. Het maakt me soms wat korteraf, maar echt gestrest ben ik er niet door. Ik denk er wel veel aan.",
+    "psychosocial_impact.extra_note": "Frustratie, lichte irritatie, pijn is veel in gedachten.",
+    "red_flags_general": false
+  },
+  "patience": {
+    "mode": "normal",
+    "budget": 15,
+    "asked": 13,
+    "wrapUp": false
+  },
+  "outcome": {
+    "type": "ended",
+    "reason": "Geen output."
+  },
+  "exportedAt": "2025-08-18T13:53:22.539Z"
+}

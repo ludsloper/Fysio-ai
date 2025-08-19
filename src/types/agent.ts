@@ -1,6 +1,6 @@
 // Types for the agentic intake flow and tool-calls
 
-export type PatienceMode = "short" | "normal" | "deep";
+export type PatienceMode = "short" | "normal" | "deep" | "uitgebreid" | "maximaal";
 
 export interface Patience {
   mode: PatienceMode;
