@@ -597,6 +597,18 @@ function AdvicePanel({ answers }: { answers: Answers }) {
 
   return (
     <div className="space-y-4">
+      <Card className="p-4 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800 flex items-center gap-3">
+        <span className="text-emerald-600">
+          <Brain className="h-5 w-5" />
+        </span>
+        <div>
+          <div className="font-medium">Bedankt voor het invullen van de vragenlijst!</div>
+          <div className="text-sm text-muted-foreground">
+            Door jouw antwoorden kunnen we je nog beter persoonlijke zorg en advies geven, helemaal afgestemd op jouw situatie. De tips en adviezen hieronder kun je direct toepassen in het dagelijks leven.
+          </div>
+        </div>
+      </Card>
+
       <Card className="p-4 space-y-3 bg-muted/30">
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-3 flex-wrap">
