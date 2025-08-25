@@ -1,25 +1,13 @@
 
 import { useState } from "react";
-import QuestionsView from "./views/QuestionsView.tsx";
+import AllQuestionsView from "./views/AllQuestionsView";
 import { Button } from "@/components/ui/button";
 
 export default function App() {
-	const ky =  'AIzaSyDRTP15ymx_sURrOpmjiOX_5W-yHNWrykU';
-	const [started, setStarted] = useState<boolean>(false);
 
 	
-	const start = () => {
-		setStarted(true);
-	};
 
-	if (!started) {
-		return (
-			<div className="mx-auto max-w-md p-6 space-y-4">
-				<h1 className="text-2xl font-semibold">Fysio Intake</h1>
-				<Button onClick={start}>Start</Button>
-			</div>
-		);
-	}
+
 
 	// if (!started) {
 	// 	return (
@@ -32,5 +20,5 @@ export default function App() {
 	// 	);
 	// }
 
-	return <QuestionsView ky={ky} />;
+		return <AllQuestionsView />;
 }

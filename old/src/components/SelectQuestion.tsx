@@ -18,7 +18,7 @@ export default function SelectQuestion({ label, value, onChange, options, placeh
           <SelectValue placeholder={placeholder || "Kies een optie"} />
         </SelectTrigger>
         <SelectContent>
-          {options.filter(opt => opt.value !== '').map(opt => (
+          {options.map(opt => (
             <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
           ))}
         </SelectContent>
