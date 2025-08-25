@@ -503,10 +503,10 @@ export default function AllQuestionsView() {
         )}
       </Card>
 
-      <div className="flex items-center gap-2">
+      {/* <div className="flex items-center gap-2">
         <Button onClick={downloadJSON} disabled={!canDownload}>Opslaan als JSON</Button>
         <div className="text-xs text-muted-foreground">Downloadt uw antwoorden lokaal als JSON-bestand.</div>
-      </div>
+      </div> */}
 
       <div className="flex items-center gap-2">
         <Button onClick={() => setShowAdvice(v => !v)} disabled={!requiredOk} variant={showAdvice ? 'default' : 'outline'}>
@@ -521,7 +521,7 @@ export default function AllQuestionsView() {
         <AdvicePanel answers={answers} />
       )}
 
-      <Card className="p-4 space-y-3">
+      {requiredOk && <Card className="p-4 space-y-3">
         <h2 className="font-semibold">Samenvatting </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="sm:col-span-2 flex items-center gap-2">
@@ -542,7 +542,7 @@ export default function AllQuestionsView() {
             <pre className="whitespace-pre-wrap text-sm">{summary}</pre>
           </div>
         )}
-      </Card>
+      </Card>}
     </div>
   );
 }
