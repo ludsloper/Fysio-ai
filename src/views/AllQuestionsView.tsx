@@ -153,6 +153,8 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
   const defaultFollowUpInstruction = 'Genereer tot maximaal 10 vervolgvragen\nop basis van de gegeven basis vraag en antwoorden.\n';
   const [followUpInstruction, setFollowUpInstruction] = useState<string>(defaultFollowUpInstruction);
   const [instructionOpen, setInstructionOpen] = useState(false);
+  // NEW: draft state used only inside the modal
+  const [instructionDraft, setInstructionDraft] = useState<string>(defaultFollowUpInstruction);
 
   // const canDownload = useMemo(() => true, []);
   const [showAdvice] = useState(false);
@@ -183,20 +185,18 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
     setFollowUpStale(false);
   }
 
-  // Auto-regenerate on standard answers change when follow-ups active (debounced)
+  // When follow-ups are active and the standard answers / instruction change,
+  // mark generated follow-ups as stale — do NOT auto-regenerate.
+  // Regeneration happens only when the user explicitly requests it (handleGenerateFollowUps).
   useEffect(() => {
     if (!followUpActive) return;
-    if (regenTimer.current) window.clearTimeout(regenTimer.current);
-    regenTimer.current = window.setTimeout(async () => {
-      if (!apiKey) return;
-      // keep stale=true (set in update) until new questions are loaded
-      await generateFollowUps(answers, apiKey, followUpInstruction, setFollowUpQuestions, setFollowUpAnswers, setFollowUpLoading, setFollowUpError);
-      setFollowUpStale(false);
-    }, 600);
-    return () => {
-      if (regenTimer.current) window.clearTimeout(regenTimer.current);
-    };
-  }, [answers, followUpActive, followUpInstruction, apiKey]);
+    setFollowUpStale(true);
+  }, [answers, followUpActive /* removed followUpInstruction to avoid stale-on-typing */]);
+
+  // Sync draft content when opening the instruction modal
+  useEffect(() => {
+    if (instructionOpen) setInstructionDraft(followUpInstruction);
+  }, [instructionOpen, followUpInstruction]);
 
   return (
     <div className="max-w-7xl mx-auto p-4 space-y-4">
@@ -685,7 +685,7 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="bg-white/80 dark:bg-background/80 border border-border rounded-md px-4 py-2 text-sm flex items-center gap-2 shadow">
                     <Loader2 className="h-4 w-4 animate-spin text-sky-600" />
-                    <div>Vervolgvragen verouderen door gewijzigde antwoorden — vernieuwen wordt gestart...</div>
+                    <div>Vervolgvragen verouderd door wijzigingen — klik “Vervolg vragen” om te vernieuwen.</div>
                   </div>
                 </div>
               )}
@@ -701,20 +701,49 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold">Vervolgvragen AI instructie</h2>
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" onClick={() => setFollowUpInstruction(defaultFollowUpInstruction)}>Reset</Button>
+                  {/* Reset only the draft, not the committed instruction */}
+                  <Button variant="ghost" onClick={() => setInstructionDraft(defaultFollowUpInstruction)}>Reset</Button>
                 </div>
               </div>
               <div className="space-y-2">
                 <Label className="text-sm">Instructie (wordt gecombineerd met vaste JSON-formatregels)</Label>
                 <textarea
                   className="w-full min-h-48 rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none"
-                  value={followUpInstruction}
-                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setFollowUpInstruction(e.target.value)}
+                  value={instructionDraft}
+                  onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setInstructionDraft(e.target.value)}
                 />
               </div>
               <div className="flex items-center justify-end gap-2">
                 <Button variant="outline" onClick={() => setInstructionOpen(false)}>Annuleer</Button>
-                <Button onClick={() => setInstructionOpen(false)}>Opslaan</Button>
+                <Button
+                  onClick={async () => {
+                    const changed = instructionDraft.trim() !== followUpInstruction.trim();
+                    if (changed) {
+                      // commit new instruction
+                      setFollowUpInstruction(instructionDraft);
+                      if (followUpActive && followUpQuestions.length > 0) {
+                        // auto-regenerate if there were already follow-up questions
+                        setFollowUpStale(true);
+                        await generateFollowUps(
+                          answers,
+                          apiKey,
+                          instructionDraft,
+                          setFollowUpQuestions,
+                          setFollowUpAnswers,
+                          setFollowUpLoading,
+                          setFollowUpError
+                        );
+                        setFollowUpStale(false);
+                      } else if (followUpActive) {
+                        // mark stale if active but nothing to regenerate yet
+                        setFollowUpStale(true);
+                      }
+                    }
+                    setInstructionOpen(false);
+                  }}
+                >
+                  Opslaan
+                </Button>
               </div>
             </Card>
           </div>
