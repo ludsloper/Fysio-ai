@@ -1,10 +1,10 @@
 
 import { useState } from "react";
-import AllQuestionsView from "./views/AllQuestionsView";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import AllQuestionsView from "./views/AllQuestionsView.tsx";
 
 export default function App() {
 	const [password, setPassword] = useState("");

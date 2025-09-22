@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { SelectQuestion, MultiSelectQuestion, YesNoQuestion } from '@/components';
 
 export type FUType = 'yesno' | 'select' | 'multiselect' | 'text' | 'number';
-export type FollowUpOption = { value: string; label: string };
+export type FollowUpOption = { value: string; label: string }
 export type FollowUpQuestion = {
   id: string;
   type: FUType;
@@ -147,6 +147,7 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
   const [followUpLoading, setFollowUpLoading] = useState(false);
   const [followUpError, setFollowUpError] = useState<string | null>(null);
   const [followUpActive, setFollowUpActive] = useState(false);
+  const [followUpStale, setFollowUpStale] = useState(false); // <-- added
   const regenTimer = useRef<number | null>(null);
 
   const defaultFollowUpInstruction = 'Genereer tot maximaal 10 vervolgvragen\nop basis van de gegeven basis vraag en antwoorden.\n';
@@ -160,6 +161,8 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
 
   function update<K extends keyof Answers>(key: K, value: Answers[K]) {
     setAnswers((prev: Answers) => ({ ...prev, [key]: value }));
+    // mark generated follow-up questions as stale when standard answers change
+    if (followUpActive) setFollowUpStale(true);
   }
 
   // Download JSON helper (momenteel niet in gebruik)
@@ -174,16 +177,21 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
       return;
     }
     setFollowUpActive(true);
+    setFollowUpStale(true); // indicate we're (about to) refresh
+    // await so we can clear the stale flag after generation completes
     await generateFollowUps(answers, apiKey, followUpInstruction, setFollowUpQuestions, setFollowUpAnswers, setFollowUpLoading, setFollowUpError);
+    setFollowUpStale(false);
   }
 
   // Auto-regenerate on standard answers change when follow-ups active (debounced)
   useEffect(() => {
     if (!followUpActive) return;
     if (regenTimer.current) window.clearTimeout(regenTimer.current);
-    regenTimer.current = window.setTimeout(() => {
+    regenTimer.current = window.setTimeout(async () => {
       if (!apiKey) return;
-      generateFollowUps(answers, apiKey, followUpInstruction, setFollowUpQuestions, setFollowUpAnswers, setFollowUpLoading, setFollowUpError);
+      // keep stale=true (set in update) until new questions are loaded
+      await generateFollowUps(answers, apiKey, followUpInstruction, setFollowUpQuestions, setFollowUpAnswers, setFollowUpLoading, setFollowUpError);
+      setFollowUpStale(false);
     }, 600);
     return () => {
       if (regenTimer.current) window.clearTimeout(regenTimer.current);
@@ -614,62 +622,73 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
             {followUpActive && !followUpLoading && followUpQuestions.length === 0 && (
               <div className="text-sm text-muted-foreground">Geen vervolgvragen gegenereerd.</div>
             )}
-            <div className="space-y-4">
-              {followUpQuestions.map(q => (
-                <div key={q.id}>
-                  {q.type === 'yesno' && (
-                    <YesNoQuestion
-                      label={q.label}
-                      value={(followUpAnswers[q.id] as boolean | null) ?? null}
-                      onChange={(v) => setFUAnswer(q.id, v)}
-                    />
-                  )}
-                  {q.type === 'select' && (
-                    <SelectQuestion
-                      label={q.label}
-                      value={(followUpAnswers[q.id] as string) || ''}
-                      onChange={(v) => setFUAnswer(q.id, v)}
-                      options={(q.options || []) as { value: string; label: string }[]}
-                      placeholder={q.placeholder}
-                    />
-                  )}
-                  {q.type === 'multiselect' && (
-                    <MultiSelectQuestion
-                      label={q.label}
-                      values={Array.isArray(followUpAnswers[q.id]) ? (followUpAnswers[q.id] as string[]) : []}
-                      onChange={(vals) => setFUAnswer(q.id, vals)}
-                      options={(q.options || []) as { value: string; label: string }[]}
-                    />
-                  )}
-                  {q.type === 'text' && (
-                    <div className="space-y-2">
-                      <Label>{q.label}</Label>
-                      <Input
-                        placeholder={q.placeholder || ''}
+            <div className="relative">
+              <div className={`space-y-4 transition-all ${followUpStale ? 'opacity-60 blur-sm' : ''}`}>
+                {followUpQuestions.map(q => (
+                  <div key={q.id}>
+                    {q.type === 'yesno' && (
+                      <YesNoQuestion
+                        label={q.label}
+                        value={(followUpAnswers[q.id] as boolean | null) ?? null}
+                        onChange={(v) => setFUAnswer(q.id, v)}
+                      />
+                    )}
+                    {q.type === 'select' && (
+                      <SelectQuestion
+                        label={q.label}
                         value={(followUpAnswers[q.id] as string) || ''}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => setFUAnswer(q.id, e.target.value)}
+                        onChange={(v) => setFUAnswer(q.id, v)}
+                        options={(q.options || []) as { value: string; label: string }[]}
+                        placeholder={q.placeholder}
                       />
-                    </div>
-                  )}
-                  {q.type === 'number' && (
-                    <div className="space-y-2">
-                      <Label>{q.label}</Label>
-                      <Input
-                        type="number"
-                        placeholder={q.placeholder || ''}
-                        value={
-                          (typeof followUpAnswers[q.id] === 'number'
-                            ? (followUpAnswers[q.id] as number)
-                            : '')
-                        }
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => setFUAnswer(q.id, e.target.value === '' ? '' : Number(e.target.value))}
-                        inputMode="numeric"
-                        pattern="[0-9]*"
+                    )}
+                    {q.type === 'multiselect' && (
+                      <MultiSelectQuestion
+                        label={q.label}
+                        values={Array.isArray(followUpAnswers[q.id]) ? (followUpAnswers[q.id] as string[]) : []}
+                        onChange={(vals) => setFUAnswer(q.id, vals)}
+                        options={(q.options || []) as { value: string; label: string }[]}
                       />
-                    </div>
-                  )}
+                    )}
+                    {q.type === 'text' && (
+                      <div className="space-y-2">
+                        <Label>{q.label}</Label>
+                        <Input
+                          placeholder={q.placeholder || ''}
+                          value={(followUpAnswers[q.id] as string) || ''}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => setFUAnswer(q.id, e.target.value)}
+                        />
+                      </div>
+                    )}
+                    {q.type === 'number' && (
+                      <div className="space-y-2">
+                        <Label>{q.label}</Label>
+                        <Input
+                          type="number"
+                          placeholder={q.placeholder || ''}
+                          value={
+                            (typeof followUpAnswers[q.id] === 'number'
+                              ? (followUpAnswers[q.id] as number)
+                              : '')
+                          }
+                          onChange={(e: ChangeEvent<HTMLInputElement>) => setFUAnswer(q.id, e.target.value === '' ? '' : Number(e.target.value))}
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {followUpStale && !followUpLoading && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="bg-white/80 dark:bg-background/80 border border-border rounded-md px-4 py-2 text-sm flex items-center gap-2 shadow">
+                    <Loader2 className="h-4 w-4 animate-spin text-sky-600" />
+                    <div>Vervolgvragen verouderen door gewijzigde antwoorden — vernieuwen wordt gestart...</div>
+                  </div>
                 </div>
-              ))}
+              )}
             </div>
           </Card>
         </div>
