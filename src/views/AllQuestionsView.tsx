@@ -153,33 +153,16 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
   const [followUpInstruction, setFollowUpInstruction] = useState<string>(defaultFollowUpInstruction);
   const [instructionOpen, setInstructionOpen] = useState(false);
 
-  const canDownload = useMemo(() => true, []);
-  const [showAdvice, setShowAdvice] = useState(false);
+  // const canDownload = useMemo(() => true, []);
+  const [showAdvice] = useState(false);
   const requiredOk = (answers.age !== '' && answers.duration !== '');
-  const [summary, setSummary] = useState<string>('');
-  const [loadingSummary, setLoadingSummary] = useState(false);
-  const [summaryError, setSummaryError] = useState<string | null>(null);
+  // Samenvatting-functie tijdelijk uitgeschakeld
 
   function update<K extends keyof Answers>(key: K, value: Answers[K]) {
     setAnswers((prev: Answers) => ({ ...prev, [key]: value }));
   }
 
-  function downloadJSON() {
-    const payload = {
-      standardAnswers: answers,
-      followUp: {
-        questions: followUpQuestions,
-        answers: followUpAnswers,
-      },
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `intake_${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+  // Download JSON helper (momenteel niet in gebruik)
 
   function setFUAnswer(id: string, value: FollowUpAnswer) {
     setFollowUpAnswers(prev => ({ ...prev, [id]: value }));
@@ -1025,6 +1008,7 @@ function AdvicePanel({ answers }: { answers: Answers }) {
 
 async function generateFollowUps(
   answers: Answers,
+  key: string,
   instruction: string,
   setQuestions: (q: FollowUpQuestion[]) => void,
   setFUAnswers: (fn: (prev: Record<string, FollowUpAnswer>) => Record<string, FollowUpAnswer>) => void,
@@ -1034,7 +1018,7 @@ async function generateFollowUps(
   setError(null);
   setLoading(true);
   try {
-    const ai = new GoogleGenAI({ apiKey: "AIzaSyDRTP15ymx_sURrOpmjiOX_5W-yHNWrykU" });;
+    const ai = new GoogleGenAI({ apiKey: key });
     const sys = [
       instruction,
       'Geef strikt JSON, zonder uitleg of markdown. Formaat:',
@@ -1071,50 +1055,6 @@ async function generateFollowUps(
   } catch (err: unknown) {
     const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : null;
     setError(msg ?? 'Er ging iets mis bij het genereren van vervolgvragen.');
-  } finally {
-    setLoading(false);
-  }
-}
-
-async function generateSummary(
-  answers: Answers,
-  key: string,
-  setSummary: (s: string) => void,
-  setLoading: (b: boolean) => void,
-  setError: (e: string | null) => void,
-) {
-  if (!key) return;
-  setError(null);
-  setLoading(true);
-  try {
-    const ai = new GoogleGenAI({ apiKey: key });
-    const lines: string[] = [];
-    lines.push('Je bent een hulp voor een fysiotherapeut. Maak een korte, klinisch bruikbare samenvatting op basis van onderstaande antwoorden. Gebruik alinea’s en eventueel bullets. Noem eventuele risico-/waarschuwingssignalen en concrete vervolgstappen.');
-    lines.push('');
-    lines.push(`Geslacht: ${answers.gender || 'n.b.'}`);
-    lines.push(`Leeftijd: ${answers.age || 'n.b.'}`);
-    lines.push(`Duur klachten: ${answers.duration || 'n.b.'}`);
-    lines.push(`Hinder (2w): ${answers.hindrance || 'n.b.'}`);
-    lines.push(`Uitstraling (2w): ${answers.radiatingToLegs || 'n.b.'}`);
-    lines.push(`Cognities – zorgen: ${answers.worried || 'n.b.'}, onveilig actief: ${answers.unsafeActive || 'n.b.'}`);
-    lines.push(`Emoties/stress – prikkelbaar: ${answers.irritable ?? 'n.b.'}, piekeren: ${answers.rumination ?? 'n.b.'}`);
-    lines.push(`Slaapkwaliteit (2w): ${answers.sleepQuality || 'n.b.'}`);
-    lines.push(`Coping: ${answers.coping || 'n.b.'}`);
-    lines.push(`Werkstress: ${answers.workStress ?? 'n.b.'}, life events: ${answers.privateEvents ?? 'n.b.'}`);
-    lines.push(`Aandoeningen: ${(answers.conditions.values || []).join(', ') || 'geen/unknown'}`);
-    if (answers.conditions.other) lines.push(`Andere aandoening: ${answers.conditions.other}`);
-    lines.push(`Medicatie: ${(answers.medication.values || []).join(', ') || 'geen/unknown'}`);
-    if (answers.medication.other) lines.push(`Andere medicatie: ${answers.medication.other}`);
-    lines.push('');
-    lines.push('Beperk je tot maximaal ~200 woorden.');
-
-    const prompt = lines.join('\n');
-    const raw = await ai.models.generateContent({ model: 'gemini-2.5-pro', contents: prompt });
-    const text = (raw.text ?? '').trim();
-    setSummary(text || '');
-  } catch (err: unknown) {
-    const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: unknown }).message) : null;
-    setError(msg ?? 'Er ging iets mis bij het genereren.');
   } finally {
     setLoading(false);
   }
