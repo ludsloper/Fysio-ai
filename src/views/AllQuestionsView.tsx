@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
+import { useEffect, useState, type ChangeEvent, type ReactNode } from 'react';
 import {
   ChevronDown,
   Activity,
@@ -16,7 +16,7 @@ import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { SelectQuestion, MultiSelectQuestion, YesNoQuestion } from '@/components';
+import { SelectQuestion, MultiSelectQuestion, YesNoQuestion, PainScale } from '@/components';
 
 export type FUType = 'yesno' | 'select' | 'multiselect' | 'text' | 'number';
 export type FollowUpOption = { value: string; label: string }
@@ -36,6 +36,10 @@ type HomeSituation = '' | 'alleen' | 'samen_zonder' | 'samen_met' | 'alleen_met'
 type Duration = '' | 'lt6w' | '6 weken – 3 maanden' | '3 – 12 maanden' | 'gt12m';
 type Severity = '' | 'niet' | 'beetje' | 'matig' | 'erg' | 'extreem';
 type Sleep = '' | 'zeer_goed' | 'goed' | 'matig' | 'slecht' | 'zeer_slecht';
+type Support = '' | 'helemaal_niet' | 'een_beetje' | 'enigszins' | 'veel' | 'heel_veel';
+type Movement = '' | 'meestal' | 'soms' | 'meestal_niet';
+type Diet = '' | 'gezond' | 'onzeker' | 'onregelmatig_ongezond';
+type Smoke = '' | 'nooit' | 'gestopt' | 'af_en_toe' | 'dagelijks';
 
 type Condition =
   | 'osteoporose'
@@ -51,7 +55,8 @@ type Condition =
   | 'aandacht'
   | 'kanker'
   | 'obesitas'
-  | 'anders';
+  | 'anders'
+  | 'geen';
 
 type Medication =
   | 'pijnstillers'
@@ -64,7 +69,8 @@ type Medication =
   | 'diabetesmedicatie'
   | 'chemo'
   | 'hormonaal'
-  | 'anders';
+  | 'anders'
+  | 'geen';
 
 interface Answers {
   // Persoonsgegevens
@@ -74,7 +80,7 @@ interface Answers {
   // 1
   education: Education;
   // 2
-  work: string; // beroep/functie en uren p/w
+  work: { job: string; hoursPerWeek: number | '' };
   // 3
   hobbies: [string, string, string];
   // 4
@@ -85,6 +91,8 @@ interface Answers {
   duration: Duration;
   // 7
   hindrance: Severity;
+  // 8
+  painIntensity: number; // 0-10
   // 8-10 + 12-13 yes/no + agree/disagree
   radiatingToLegs: Agree; // eens/oneens
   worried: Agree;
@@ -92,16 +100,22 @@ interface Answers {
   coping: 'avoid' | 'push_through' | 'pacing' | '';
   copingAvoidDetails?: string;
   irritable: boolean | null;
+  tension: boolean | null;
   rumination: boolean | null;
-  enjoyDespitePain: Agree;
-  lessSocial: Agree;
+  enjoyDespitePain: boolean | null;
   depressed: Agree;
   // 16 sleep
   sleepQuality: Sleep;
+  // 18 sociaal
+  socialSupport: Support;
   // 17-19
   workStress: boolean | null;
   privateEvents: boolean | null;
   expectInfluence: boolean | null;
+  // 23-25 leefstijl
+  movement: Movement;
+  diet: Diet;
+  smoking: Smoke;
   // 20-21
   conditions: { values: Condition[]; other?: string };
   medication: { values: Medication[]; other?: string };
@@ -118,26 +132,31 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
     age: '',
     language: '',
     education: '',
-    work: '',
+  work: { job: '', hoursPerWeek: '' },
     hobbies: ['', '', ''],
     sport: { name: '', hoursPerWeek: '' },
     home: { situation: '' },
     duration: '',
     hindrance: '',
+    painIntensity: 0,
     radiatingToLegs: '',
     worried: '',
     unsafeActive: '',
     coping: '',
     copingAvoidDetails: '',
     irritable: null,
+    tension: null,
     rumination: null,
-    enjoyDespitePain: '',
-    lessSocial: '',
+    enjoyDespitePain: null,
     depressed: '',
     sleepQuality: '',
+    socialSupport: '',
     workStress: null,
     privateEvents: null,
     expectInfluence: null,
+    movement: '',
+    diet: '',
+    smoking: '',
     conditions: { values: [] },
     medication: { values: [] },
   });
@@ -148,7 +167,7 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
   const [followUpError, setFollowUpError] = useState<string | null>(null);
   const [followUpActive, setFollowUpActive] = useState(false);
   const [followUpStale, setFollowUpStale] = useState(false); // <-- added
-  const regenTimer = useRef<number | null>(null);
+  // removed unused regenTimer
 
   const defaultFollowUpInstruction = 'Genereer tot maximaal 10 vervolgvragen\nop basis van de gegeven basis vraag en antwoorden.\n';
   const [followUpInstruction, setFollowUpInstruction] = useState<string>(defaultFollowUpInstruction);
@@ -246,7 +265,7 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
           options={[
             { value: 'ja', label: 'Ja' },
             { value: 'nee', label: 'Nee' },
-            { value: 'hulp', label: 'Nee, maar ik heb hulp bij het invullen' },
+            { value: 'hulp', label: 'Nee, maar ik heb op dit moment goede hulp bij me om deze vragenlijst in te vullen' },
           ]}
         />
       </Card>
@@ -270,11 +289,28 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
 
       <Card className="p-4 space-y-4">
         <h2 className="font-semibold">2. Werk</h2>
-        <Input
-          placeholder="Beroep/functie en aantal uren per week"
-          value={answers.work}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => update('work', e.target.value)}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="sm:col-span-2">
+            <Input
+              placeholder="Beroep/functie"
+              value={answers.work.job}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => update('work', { ...answers.work, job: e.target.value })}
+              autoComplete="off"
+              name="work_job"
+            />
+          </div>
+          <div>
+            <Input
+              type="number"
+              placeholder="Uren per week"
+              value={answers.work.hoursPerWeek}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => update('work', { ...answers.work, hoursPerWeek: e.target.value === '' ? '' : Number(e.target.value) })}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              name="work_hours_per_week"
+            />
+          </div>
+        </div>
       </Card>
 
       <Card className="p-4 space-y-4">
@@ -377,6 +413,18 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
+        <h2 className="font-semibold">8. Pijnintensiteit</h2>
+        <PainScale
+          label="Hoe erg is uw lage rugpijn gemiddeld in de laatste 2 weken? (0 = geen pijn, 10 = ergst denkbare)"
+          value={answers.painIntensity}
+          onChange={(v) => update('painIntensity', v)}
+          min={0}
+          max={10}
+          anchors={["geen pijn", "ergst denkbare"]}
+        />
+      </Card>
+
+      <Card className="p-4 space-y-4">
         <h2 className="font-semibold">8–10. Cognities/symptomen</h2>
         <SelectQuestion
           label="In de laatste 2 weken straalde mijn rugpijn wel eens uit naar één of beide benen?"
@@ -424,11 +472,16 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">12–13. Emoties/stress</h2>
+        <h2 className="font-semibold">13–15. Emoties/stress</h2>
         <YesNoQuestion
           label="Bent u de laatste tijd prikkelbaarder of emotioneler dan normaal?"
           value={answers.irritable}
           onChange={v => update('irritable', v)}
+        />
+        <YesNoQuestion
+          label="Ervaart u de laatste tijd spanning, druk, stress of onrust in uw lichaam?"
+          value={answers.tension}
+          onChange={v => update('tension', v)}
         />
         <YesNoQuestion
           label="Heeft u last van piekeren, malen of nadenken zonder dat u dat kunt stoppen?"
@@ -438,18 +491,11 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">14–15. Somberheid/sociaal</h2>
-        <SelectQuestion
-          label="Kunt u ondanks uw rugklachten nog plezier of zin ervaren in dingen die u doet?"
+        <h2 className="font-semibold">16–18. Somberheid/sociaal</h2>
+        <YesNoQuestion
+          label="Kunt u ondanks uw rugklachten nog plezier beleven aan sociale activiteiten of andere dingen?"
           value={answers.enjoyDespitePain}
-          onChange={v => update('enjoyDespitePain', v as Agree)}
-          options={[...agreeOptions]}
-        />
-        <SelectQuestion
-          label="De laatste tijd heb ik minder behoefte of mogelijkheden om sociale dingen te doen?"
-          value={answers.lessSocial}
-          onChange={v => update('lessSocial', v as Agree)}
-          options={[...agreeOptions]}
+          onChange={v => update('enjoyDespitePain', v)}
         />
         <SelectQuestion
           label="De laatste tijd voel ik me neerslachtig of depressief"
@@ -457,10 +503,22 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
           onChange={v => update('depressed', v as Agree)}
           options={[...agreeOptions]}
         />
+        <SelectQuestion
+          label="In welke mate voelt u zich gesteund en begrepen door de mensen in uw omgeving bij uw rugklachten?"
+          value={answers.socialSupport}
+          onChange={v => update('socialSupport', v as Support)}
+          options={[
+            { value: 'helemaal_niet', label: 'Helemaal niet' },
+            { value: 'een_beetje', label: 'Een beetje' },
+            { value: 'enigszins', label: 'Enigszins' },
+            { value: 'veel', label: 'Veel' },
+            { value: 'heel_veel', label: 'Heel veel' },
+          ]}
+        />
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">16. Slaap</h2>
+        <h2 className="font-semibold">19. Slaap</h2>
         <SelectQuestion
           label="Over het geheel genomen, hoe ervaarde u uw slaapkwaliteit in de laatste 2 weken?"
           value={answers.sleepQuality}
@@ -476,7 +534,7 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">17–19. Werk/leven/verwachting</h2>
+        <h2 className="font-semibold">20–22. Werk/leven/verwachting</h2>
         <YesNoQuestion
           label="Ervaart u de laatste tijd werkdruk, stress of andere problemen in uw werk?"
           value={answers.workStress}
@@ -495,11 +553,51 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">20. Aandoeningen</h2>
+        <h2 className="font-semibold">23–25. Leefstijl</h2>
+        <SelectQuestion
+          label="Komt u in een gewone week toe aan voldoende beweging (minstens 150 minuten per week, zoals stevig wandelen, fietsen of sport)?"
+          value={answers.movement}
+          onChange={v => update('movement', v as Movement)}
+          options={[
+            { value: 'meestal', label: 'Ja, meestal wel' },
+            { value: 'soms', label: 'Soms' },
+            { value: 'meestal_niet', label: 'Nee, meestal niet' },
+          ]}
+        />
+        <SelectQuestion
+          label="Hoe gezond vindt u uw voedingspatroon?"
+          value={answers.diet}
+          onChange={v => update('diet', v as Diet)}
+          options={[
+            { value: 'gezond', label: 'Ik eet meestal gezond en gevarieerd' },
+            { value: 'onzeker', label: 'Ik weet het niet goed, vind dit lastig te zeggen' },
+            { value: 'onregelmatig_ongezond', label: 'Ik eet vaak onregelmatig of ongezond' },
+          ]}
+        />
+        <SelectQuestion
+          label="Rookt u op dit moment?"
+          value={answers.smoking}
+          onChange={v => update('smoking', v as Smoke)}
+          options={[
+            { value: 'nooit', label: 'Nee, nooit gerookt' },
+            { value: 'gestopt', label: 'Nee, ik ben gestopt' },
+            { value: 'af_en_toe', label: 'Ja, af en toe' },
+            { value: 'dagelijks', label: 'Ja, dagelijks' },
+          ]}
+        />
+      </Card>
+
+      <Card className="p-4 space-y-4">
+        <h2 className="font-semibold">26. Aandoeningen</h2>
         <MultiSelectQuestion
           label="Heeft u andere aandoeningen of gezondheidsproblemen? (meerdere opties mogelijk)"
           values={answers.conditions.values as string[]}
-          onChange={vals => update('conditions', { ...answers.conditions, values: vals as Condition[] })}
+          onChange={vals => {
+            let v = vals as Condition[];
+            if (v.includes('geen')) v = ['geen'];
+            else v = v.filter(x => x !== 'geen');
+            update('conditions', { ...answers.conditions, values: v });
+          }}
           options={[
             { value: 'osteoporose', label: 'Osteoporose / botontkalking' },
             { value: 'diabetes', label: 'Diabetes mellitus' },
@@ -515,9 +613,10 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
             { value: 'kanker', label: 'Kanker (verleden of huidig)' },
             { value: 'obesitas', label: 'Overgewicht of obesitas' },
             { value: 'anders', label: 'Andere aandoening' },
+            { value: 'geen', label: 'Nee' },
           ]}
         />
-        {answers.conditions.values.includes('anders') && (
+        {answers.conditions.values.includes('anders') && !answers.conditions.values.includes('geen') && (
           <Input
             placeholder="Specificeer andere aandoening"
             value={answers.conditions.other || ''}
@@ -527,11 +626,16 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">21. Medicatie</h2>
+        <h2 className="font-semibold">27. Medicatie</h2>
         <MultiSelectQuestion
           label="Gebruikt u één van de onderstaande medicijnen? (meerdere antwoorden mogelijk)"
           values={answers.medication.values as string[]}
-          onChange={vals => update('medication', { ...answers.medication, values: vals as Medication[] })}
+          onChange={vals => {
+            let v = vals as Medication[];
+            if (v.includes('geen')) v = ['geen'];
+            else v = v.filter(x => x !== 'geen');
+            update('medication', { ...answers.medication, values: v });
+          }}
           options={[
             { value: 'pijnstillers', label: 'Pijnstillers / NSAID’s' },
             { value: 'maagbeschermers', label: 'Maagbeschermers' },
@@ -544,9 +648,10 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
             { value: 'chemo', label: 'Chemotherapie / doelgerichte therapie' },
             { value: 'hormonaal', label: 'Hormonale therapie' },
             { value: 'anders', label: 'Andere medicatie' },
+            { value: 'geen', label: 'Nee' },
           ]}
         />
-        {answers.medication.values.includes('anders') && (
+        {answers.medication.values.includes('anders') && !answers.medication.values.includes('geen') && (
           <Input
             placeholder="Specificeer andere medicatie"
             value={answers.medication.other || ''}
@@ -685,7 +790,7 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="bg-white/80 dark:bg-background/80 border border-border rounded-md px-4 py-2 text-sm flex items-center gap-2 shadow">
                     <Loader2 className="h-4 w-4 animate-spin text-sky-600" />
-                    <div>Vervolgvragen verouderd door wijzigingen — klik “Vervolg vragen” om te vernieuwen.</div>
+                    <div>Vervolgvragen worden opnieuw gegenereerd.</div>
                   </div>
                 </div>
               )}
@@ -760,11 +865,11 @@ function AdvicePanel({ answers }: { answers: Answers }) {
   const hinderlijk = answers.hindrance === 'erg' || answers.hindrance === 'extreem';
   const uitstraling = answers.radiatingToLegs === 'eens';
   const cognitief = answers.worried === 'eens' || answers.unsafeActive === 'eens';
-  const stress = answers.irritable === true || answers.rumination === true;
+  const stress = answers.irritable === true || answers.tension === true || answers.rumination === true;
   const slechtSlapen = ['matig', 'slecht', 'zeer_slecht'].includes(answers.sleepQuality);
   const werkLeven = answers.workStress === true || answers.privateEvents === true;
-  const heeftCondities = (answers.conditions.values?.length ?? 0) > 0;
-  const heeftMedicatie = (answers.medication.values?.length ?? 0) > 0;
+  const heeftCondities = (answers.conditions.values?.filter(v => v !== 'geen')?.length ?? 0) > 0;
+  const heeftMedicatie = (answers.medication.values?.filter(v => v !== 'geen')?.length ?? 0) > 0;
 
   function Pill({ label, tone = 'default' }: { label: string; tone?: 'default' | 'green' | 'amber' | 'red' | 'blue' | 'purple' }) {
     const toneMap: Record<string, string> = {
@@ -1074,7 +1179,8 @@ async function generateFollowUps(
       'Kies vraagtypes passend bij het onderwerp. Gebruik Nederlandse labels en opties. Kies logische, bondige vragen die klinisch relevant zijn. Geef bij select/multiselect maximaal 6 opties.'
     ].join('\n');
     const prompt = `${sys}\n\nAntwoorden:\n${JSON.stringify(answers, null, 2)}`;
-    const raw = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt });
+    const raw = await ai.models.generateContent({ model: 'gemini-2.5-flash- preview-09-2025', contents: prompt, config: {thinkingConfig: {thinkingBudget: 1000} } });
+    console.log(raw);
     const text = (raw.text ?? '').trim();
     let data: unknown = null;
     try {
