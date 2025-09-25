@@ -27,7 +27,8 @@ export default function App() {
 			}
 			const data = (await res.json()) as { token?: string };
 			if (!data.token) throw new Error("Ongeldig antwoord van server");
-			setApiKey(data.token);
+			// We only need to verify password; don't use the token on the frontend anymore.
+			setApiKey("ok");
 		} catch (e) {
 			const msg = e instanceof Error ? e.message : "Onbekende fout";
 			setError(msg);
@@ -65,5 +66,5 @@ export default function App() {
 		);
 	}
 
-	return <AllQuestionsView apiKey={apiKey} />;
+	return <AllQuestionsView password={password} />;
 }

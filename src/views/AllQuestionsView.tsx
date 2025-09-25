@@ -11,7 +11,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
+// Backend-mediated LLM: no direct GoogleGenAI in frontend
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -126,7 +126,7 @@ const agreeOptions = [
   { value: 'eens', label: 'Eens' },
 ] as const;
 
-export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
+export default function AllQuestionsView({ password }: { password: string }) {
   const [answers, setAnswers] = useState<Answers>({
     gender: '',
     age: '',
@@ -193,14 +193,14 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
   }
 
   async function handleGenerateFollowUps() {
-    if (!apiKey) {
-      setFollowUpError('Geen API key beschikbaar.');
+    if (!password) {
+      setFollowUpError('Geen toegang.');
       return;
     }
     setFollowUpActive(true);
     setFollowUpStale(true); // indicate we're (about to) refresh
     // await so we can clear the stale flag after generation completes
-    await generateFollowUps(answers, apiKey, followUpInstruction, setFollowUpQuestions, setFollowUpAnswers, setFollowUpLoading, setFollowUpError);
+    await generateFollowUps(answers, password, followUpInstruction, setFollowUpQuestions, setFollowUpAnswers, setFollowUpLoading, setFollowUpError);
     setFollowUpStale(false);
   }
 
@@ -831,7 +831,7 @@ export default function AllQuestionsView({ apiKey }: { apiKey: string }) {
                         setFollowUpStale(true);
                         await generateFollowUps(
                           answers,
-                          apiKey,
+                          password,
                           instructionDraft,
                           setFollowUpQuestions,
                           setFollowUpAnswers,
@@ -1161,7 +1161,7 @@ function AdvicePanel({ answers }: { answers: Answers }) {
 
 async function generateFollowUps(
   answers: Answers,
-  key: string,
+  password: string,
   instruction: string,
   setQuestions: (q: FollowUpQuestion[]) => void,
   setFUAnswers: (fn: (prev: Record<string, FollowUpAnswer>) => Record<string, FollowUpAnswer>) => void,
@@ -1171,32 +1171,17 @@ async function generateFollowUps(
   setError(null);
   setLoading(true);
   try {
-    const ai = new GoogleGenAI({ apiKey: key });
-    const sys = [
-      instruction,
-      'Geef strikt JSON, zonder uitleg of markdown. Formaat:',
-      '{ "questions": [ { "id": "string", "type": "yesno|select|multiselect|text|number", "label": "string", "options": [{"value":"string","label":"string"}]?, "placeholder": "string"? } ] }',
-      'Kies vraagtypes passend bij het onderwerp. Gebruik Nederlandse labels en opties. Kies logische, bondige vragen die klinisch relevant zijn. Geef bij select/multiselect maximaal 6 opties.'
-    ].join('\n');
-    const prompt = `${sys}\n\nAntwoorden:\n${JSON.stringify(answers, null, 2)}`;
-    const raw = await ai.models.generateContent({ model: 'gemini-2.5-flash- preview-09-2025', contents: prompt, config: {thinkingConfig: {thinkingBudget: 1000} } });
-    console.log(raw);
-    const text = (raw.text ?? '').trim();
-    let data: unknown = null;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      // try to salvage JSON between first { and last }
-      const start = text.indexOf('{');
-      const end = text.lastIndexOf('}');
-      if (start >= 0 && end > start) {
-        const sliced = text.slice(start, end + 1);
-        data = JSON.parse(sliced);
-      } else {
-        throw new Error('Ongeldig AI-antwoord');
-      }
+    const res = await fetch('https://api.fynlo.nl/followups', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password, answers, instruction }),
+    });
+    if (!res.ok) {
+      const txt = await res.text().catch(() => '');
+      throw new Error(txt || `Backend fout (${res.status})`);
     }
-    const questionsArr = (data as { questions?: FollowUpQuestion[] } | null)?.questions;
+    const data = await res.json() as { questions?: FollowUpQuestion[] };
+    const questionsArr = data?.questions;
     const qs: FollowUpQuestion[] = Array.isArray(questionsArr) ? questionsArr.slice(0, 10) : [];
     setQuestions(qs);
     setFUAnswers(() => {
