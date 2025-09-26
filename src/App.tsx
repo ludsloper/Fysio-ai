@@ -16,7 +16,7 @@ export default function App() {
 		setError(null);
 		setLoading(true);
 		try {
-			const res = await fetch("https://api.fynlo.nl/get_g_token", {
+			const res = await fetch("https://api.fynlo.nl/verify_password", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ input: password }),
