@@ -425,7 +425,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">8–10. Cognities/symptomen</h2>
+        <h2 className="font-semibold">9–11. Cognities/symptomen</h2>
         <SelectQuestion
           label="In de laatste 2 weken straalde mijn rugpijn wel eens uit naar één of beide benen?"
           value={answers.radiatingToLegs}
@@ -447,7 +447,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">11. Coping</h2>
+        <h2 className="font-semibold">12. Coping</h2>
         <SelectQuestion
           label="In de praktijk zien wij dat mensen verschillend omgaan met rugpijn. Wat past het beste bij u?"
           value={answers.coping}
@@ -546,7 +546,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
           onChange={v => update('privateEvents', v)}
         />
         <YesNoQuestion
-          label="Verwacht u nog dat er invloed is uit te oefenen op deze rugklachten?"
+          label="Denkt u dat er nog iets te doen is waardoor uw rugklachten beter worden?"
           value={answers.expectInfluence}
           onChange={v => update('expectInfluence', v)}
         />
@@ -575,7 +575,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
           ]}
         />
         <SelectQuestion
-          label="Rookt u op dit moment?"
+          label="Rookt of vapet u op dit moment?"
           value={answers.smoking}
           onChange={v => update('smoking', v as Smoke)}
           options={[
@@ -637,7 +637,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
             update('medication', { ...answers.medication, values: v });
           }}
           options={[
-            { value: 'pijnstillers', label: 'Pijnstillers / NSAID’s' },
+            { value: 'pijnstillers', label: 'Pijnstillers / NSAIDs' },
             { value: 'maagbeschermers', label: 'Maagbeschermers' },
             { value: 'bloedverdunners', label: 'Bloedverdunners / antistolling' },
             { value: 'betablokkers', label: 'Bètablokkers' },
@@ -651,6 +651,13 @@ export default function AllQuestionsView({ password }: { password: string }) {
             { value: 'geen', label: 'Nee' },
           ]}
         />
+        {answers.medication.values.includes('pijnstillers') && !answers.medication.values.includes('geen') && (
+          <Input
+            placeholder="Welke pijnstillers gebruikt u? (bijv. paracetamol, ibuprofen, naproxen, tramadol)"
+            value={answers.medication.other || ''}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => update('medication', { ...answers.medication, other: e.target.value })}
+          />
+        )}
         {answers.medication.values.includes('anders') && !answers.medication.values.includes('geen') && (
           <Input
             placeholder="Specificeer andere medicatie"
@@ -1159,6 +1166,119 @@ function AdvicePanel({ answers }: { answers: Answers }) {
   );
 }
 
+// Question mapping with numbers and full text
+const questionMapping: Record<string, { number: string; question: string }> = {
+  gender: { number: 'P1', question: 'Geslacht' },
+  age: { number: 'P2', question: 'Leeftijd (jaren)' },
+  language: { number: 'P3', question: 'Spreekt u voldoende Nederlands om medische informatie goed te begrijpen?' },
+  education: { number: '1', question: 'Wat is uw hoogste afgeronde opleidingsniveau (gezondheidsvaardigheden)?' },
+  'work.job': { number: '2a', question: 'Beroep/functie' },
+  'work.hoursPerWeek': { number: '2b', question: 'Werk - Uren per week' },
+  'hobbies.0': { number: '3a', question: 'Hobby 1' },
+  'hobbies.1': { number: '3b', question: 'Hobby 2' },
+  'hobbies.2': { number: '3c', question: 'Hobby 3' },
+  'sport.name': { number: '4a', question: 'Welke sport?' },
+  'sport.hoursPerWeek': { number: '4b', question: 'Sport - Uren per week' },
+  'home.situation': { number: '5', question: 'Wat is uw huidige thuissituatie?' },
+  'home.other': { number: '5b', question: 'Thuissituatie - Toelichting' },
+  duration: { number: '6', question: 'Hoelang heeft u al rugklachten?' },
+  hindrance: { number: '7', question: 'Over het geheel genomen, hoe hinderlijk was uw rugpijn in de laatste 2 weken?' },
+  painIntensity: { number: '8', question: 'Hoe erg is uw lage rugpijn gemiddeld in de laatste 2 weken? (0 = geen pijn, 10 = ergst denkbare)' },
+  radiatingToLegs: { number: '9', question: 'In de laatste 2 weken straalde mijn rugpijn wel eens uit naar één of beide benen?' },
+  worried: { number: '10', question: 'Ik maak mij grote zorgen over mijn rugklachten?' },
+  unsafeActive: { number: '11', question: 'Door mijn rugklachten vind ik het niet veilig om lichamelijk actief te zijn?' },
+  coping: { number: '12', question: 'In de praktijk zien wij dat mensen verschillend omgaan met rugpijn. Wat past het beste bij u?' },
+  copingAvoidDetails: { number: '12b', question: 'Coping - Welke bewegingen/activiteiten vermijdt u?' },
+  irritable: { number: '13', question: 'Bent u de laatste tijd prikkelbaarder of emotioneler dan normaal?' },
+  tension: { number: '14', question: 'Ervaart u de laatste tijd spanning, druk, stress of onrust in uw lichaam?' },
+  rumination: { number: '15', question: 'Heeft u last van piekeren, malen of nadenken zonder dat u dat kunt stoppen?' },
+  enjoyDespitePain: { number: '16', question: 'Kunt u ondanks uw rugklachten nog plezier beleven aan sociale activiteiten of andere dingen?' },
+  depressed: { number: '17', question: 'De laatste tijd voel ik me neerslachtig of depressief' },
+  socialSupport: { number: '18', question: 'In welke mate voelt u zich gesteund en begrepen door de mensen in uw omgeving bij uw rugklachten?' },
+  sleepQuality: { number: '19', question: 'Over het geheel genomen, hoe ervaarde u uw slaapkwaliteit in de laatste 2 weken?' },
+  workStress: { number: '20', question: 'Ervaart u de laatste tijd werkdruk, stress of andere problemen in uw werk?' },
+  privateEvents: { number: '21', question: 'Heeft u de laatste tijd ingrijpende gebeurtenissen of spanningen in uw privéleven ervaren?' },
+  expectInfluence: { number: '22', question: 'Denkt u dat er nog iets te doen is waardoor uw rugklachten beter worden?' },
+  movement: { number: '23', question: 'Komt u in een gewone week toe aan voldoende beweging?' },
+  diet: { number: '24', question: 'Hoe gezond vindt u uw voedingspatroon?' },
+  smoking: { number: '25', question: 'Rookt of vapet u op dit moment?' },
+  'conditions.values': { number: '26', question: 'Heeft u andere aandoeningen of gezondheidsproblemen?' },
+  'conditions.other': { number: '26b', question: 'Aandoeningen - Specificatie andere aandoening' },
+  'medication.values': { number: '27', question: 'Gebruikt u één van de onderstaande medicijnen?' },
+  'medication.other': { number: '27b', question: 'Medicatie - Specificatie andere medicatie' },
+};
+
+function buildQuestionsAndAnswers(answers: Answers) {
+  const questionsAndAnswers: Array<{ number: string; question: string; answer: unknown }> = [];
+  
+  // Helper to add an entry
+  const addEntry = (key: string, value: unknown) => {
+    const mapping = questionMapping[key];
+    if (mapping && value !== '' && value !== null && value !== undefined) {
+      questionsAndAnswers.push({
+        number: mapping.number,
+        question: mapping.question,
+        answer: value,
+      });
+    }
+  };
+
+  // Persoonsgegevens
+  addEntry('gender', answers.gender);
+  addEntry('age', answers.age);
+  addEntry('language', answers.language);
+  
+  // Numbered questions
+  addEntry('education', answers.education);
+  addEntry('work.job', answers.work.job);
+  addEntry('work.hoursPerWeek', answers.work.hoursPerWeek);
+  
+  if (answers.hobbies[0]) addEntry('hobbies.0', answers.hobbies[0]);
+  if (answers.hobbies[1]) addEntry('hobbies.1', answers.hobbies[1]);
+  if (answers.hobbies[2]) addEntry('hobbies.2', answers.hobbies[2]);
+  
+  addEntry('sport.name', answers.sport.name);
+  addEntry('sport.hoursPerWeek', answers.sport.hoursPerWeek);
+  
+  addEntry('home.situation', answers.home.situation);
+  if (answers.home.other) addEntry('home.other', answers.home.other);
+  
+  addEntry('duration', answers.duration);
+  addEntry('hindrance', answers.hindrance);
+  addEntry('painIntensity', answers.painIntensity);
+  addEntry('radiatingToLegs', answers.radiatingToLegs);
+  addEntry('worried', answers.worried);
+  addEntry('unsafeActive', answers.unsafeActive);
+  addEntry('coping', answers.coping);
+  if (answers.copingAvoidDetails) addEntry('copingAvoidDetails', answers.copingAvoidDetails);
+  
+  addEntry('irritable', answers.irritable);
+  addEntry('tension', answers.tension);
+  addEntry('rumination', answers.rumination);
+  addEntry('enjoyDespitePain', answers.enjoyDespitePain);
+  addEntry('depressed', answers.depressed);
+  addEntry('socialSupport', answers.socialSupport);
+  addEntry('sleepQuality', answers.sleepQuality);
+  addEntry('workStress', answers.workStress);
+  addEntry('privateEvents', answers.privateEvents);
+  addEntry('expectInfluence', answers.expectInfluence);
+  addEntry('movement', answers.movement);
+  addEntry('diet', answers.diet);
+  addEntry('smoking', answers.smoking);
+  
+  if (answers.conditions.values.length > 0) {
+    addEntry('conditions.values', answers.conditions.values);
+  }
+  if (answers.conditions.other) addEntry('conditions.other', answers.conditions.other);
+  
+  if (answers.medication.values.length > 0) {
+    addEntry('medication.values', answers.medication.values);
+  }
+  if (answers.medication.other) addEntry('medication.other', answers.medication.other);
+  
+  return questionsAndAnswers;
+}
+
 async function generateFollowUps(
   answers: Answers,
   password: string,
@@ -1171,10 +1291,17 @@ async function generateFollowUps(
   setError(null);
   setLoading(true);
   try {
+    const questionsAndAnswers = buildQuestionsAndAnswers(answers);
+    
     const res = await fetch('https://api.fynlo.nl/followups-experimental', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password, answers, instruction }),
+      body: JSON.stringify({ 
+        password, 
+        // answers, // Keep the original format for backward compatibility
+        questionsAndAnswers, // New format with numbers and questions
+        instruction 
+      }),
     });
     if (!res.ok) {
       const txt = await res.text().catch(() => '');
