@@ -42,7 +42,7 @@ export default function App() {
 			<div className="min-h-screen grid place-items-center p-4">
 				<Card className="w-full max-w-sm p-6 space-y-4">
 					<div>
-						<h1 className="text-xl font-semibold">Fysio Intake – Toegang</h1>
+						<h1 className="text-xl font-semibold">Fysio Intake – Toegang!</h1>
 						<p className="text-sm text-muted-foreground">Voer wachtwoord in om te starten.</p>
 					</div>
 					<div className="space-y-2">
