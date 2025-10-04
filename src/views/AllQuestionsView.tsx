@@ -72,6 +72,109 @@ type Medication =
   | 'anders'
   | 'geen';
 
+// Value-to-label maps for user-facing JSON
+const genderMap: Record<string, string> = { man: 'Man', vrouw: 'Vrouw' };
+const languageMap: Record<string, string> = {
+  ja: 'Ja',
+  nee: 'Nee',
+  hulp: 'Nee, maar ik heb op dit moment goede hulp bij me om deze vragenlijst in te vullen',
+};
+const educationMap: Record<string, string> = {
+  geen: 'Geen opleiding',
+  basisonderwijs: 'Basisonderwijs',
+  praktijk_mbo1_vmbob: 'Praktijkonderwijs / MBO-1 / VMBO-B',
+  vmbo_t_mavo_mbo2_3: 'VMBO-T / MAVO / MBO-2 / MBO-3',
+  havo_vwo_mbo4: 'HAVO / VWO / MBO-4',
+  hbo_wo: 'HBO / WO',
+};
+const homeSituationMap: Record<string, string> = {
+  alleen: 'Alleenwonend',
+  samen_zonder: 'Samenwonend zonder kinderen',
+  samen_met: 'Samenwonend met kinderen',
+  alleen_met: 'Alleenstaand met kinderen',
+  anders: 'Anders, namelijk…',
+};
+const durationMap: Record<string, string> = {
+  lt6w: 'Minder dan 6 weken',
+  '6 weken – 3 maanden': '6 weken – 3 maanden',
+  '3 – 12 maanden': '3 – 12 maanden',
+  gt12m: 'Langer dan 12 maanden',
+};
+const severityMap: Record<string, string> = {
+  niet: 'In het geheel niet',
+  beetje: 'Een beetje',
+  matig: 'Matig',
+  erg: 'Erg',
+  extreem: 'Extreem',
+};
+const agreeMap: Record<string, string> = { eens: 'Eens', oneens: 'Oneens' };
+const sleepMap: Record<string, string> = {
+  zeer_goed: 'Zeer goed',
+  goed: 'Goed',
+  matig: 'Matig',
+  slecht: 'Slecht',
+  zeer_slecht: 'Zeer slecht',
+};
+const supportMap: Record<string, string> = {
+  helemaal_niet: 'Helemaal niet',
+  een_beetje: 'Een beetje',
+  enigszins: 'Enigszins',
+  veel: 'Veel',
+  heel_veel: 'Heel veel',
+};
+const movementMap: Record<string, string> = {
+  meestal: 'Ja, meestal wel',
+  soms: 'Soms',
+  meestal_niet: 'Nee, meestal niet',
+};
+const dietMap: Record<string, string> = {
+  gezond: 'Ik eet meestal gezond en gevarieerd',
+  onzeker: 'Ik weet het niet goed, vind dit lastig te zeggen',
+  onregelmatig_ongezond: 'Ik eet vaak onregelmatig of ongezond',
+};
+const smokeMap: Record<string, string> = {
+  nooit: 'Nee, nooit gerookt',
+  gestopt: 'Nee, ik ben gestopt',
+  af_en_toe: 'Ja, af en toe',
+  dagelijks: 'Ja, dagelijks',
+};
+const conditionMap: Record<string, string> = {
+  osteoporose: 'Osteoporose / botontkalking',
+  diabetes: 'Diabetes mellitus',
+  hartvaat: 'Hart- of vaatziekten',
+  copd: 'COPD of andere longziekte',
+  schildklier: 'Schildklieraandoening',
+  migraine: 'Migraine of hoofdpijnstoornis',
+  reuma: 'Reuma, Bechterew of auto-immuunziekte',
+  crohn_pds: 'Ziekte van Crohn / PDS',
+  neuro: 'Neurologische aandoening (MS, Parkinson, hernia, neuropathie)',
+  psych: 'Psychische klachten of diagnose (depressie, angst, PTSS, burn-out)',
+  aandacht: 'Aandachts-/prikkelverwerkingsstoornis (ADD, ADHD, HSP, ASS)',
+  kanker: 'Kanker (verleden of huidig)',
+  obesitas: 'Overgewicht of obesitas',
+  anders: 'Andere aandoening',
+  geen: 'Nee',
+};
+const medicationMap: Record<string, string> = {
+  pijnstillers: 'Pijnstillers / NSAIDs',
+  maagbeschermers: 'Maagbeschermers',
+  bloedverdunners: 'Bloedverdunners / antistolling',
+  betablokkers: 'Bètablokkers',
+  corticosteroiden: 'Corticosteroïden',
+  slaapmedicatie: 'Slaapmedicatie',
+  antidepressiva: 'Antidepressiva / angstremmers',
+  diabetesmedicatie: 'Diabetesmedicatie',
+  chemo: 'Chemotherapie / doelgerichte therapie',
+  hormonaal: 'Hormonale therapie',
+  anders: 'Andere medicatie',
+  geen: 'Nee',
+};
+const copingMap: Record<string, string> = {
+  avoid: 'Ik vermijd bewegingen en activiteiten die pijn geven, ik ben erg voorzichtig',
+  push_through: 'Ik ga door met alles en negeer de pijn, ook als het klachten geeft',
+  pacing: 'Ik probeer een middenweg te kiezen: blijven bewegen zonder over grenzen te gaan',
+};
+
 interface Answers {
   // Persoonsgegevens
   gender: '' | 'man' | 'vrouw';
@@ -89,6 +192,8 @@ interface Answers {
   home: { situation: HomeSituation; other?: string };
   // 6
   duration: Duration;
+  // 7
+  previousLowBackPain: boolean | null;
   // 7
   hindrance: Severity;
   // 8
@@ -137,6 +242,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
     sport: { name: '', hoursPerWeek: '' },
     home: { situation: '' },
     duration: '',
+    previousLowBackPain: null,
     hindrance: '',
     painIntensity: 0,
     radiatingToLegs: '',
@@ -221,7 +327,12 @@ export default function AllQuestionsView({ password }: { password: string }) {
     <div className="max-w-7xl mx-auto p-4 space-y-4">
       <div className="flex items-center justify-between gap-2">
         <h1 className="text-2xl font-semibold">Fysio Intake – Vragenlijst</h1>
+<div>
+        <Button variant="outline" onClick={handleGenerateFollowUps} >
+          {followUpLoading ? 'Vervolgvragen laden…' : 'Vervolgvragen laden'}
+        </Button>
         <Button variant="outline" onClick={() => setInstructionOpen(true)}>Vervolgvragen AI instructie</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
@@ -397,7 +508,16 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">7. Hinder</h2>
+        <h2 className="font-semibold">7. Eerdere lage rugklachten</h2>
+        <YesNoQuestion
+          label="Heeft u in het verleden eerder lage rugklachten gehad?"
+          value={answers.previousLowBackPain}
+          onChange={v => update('previousLowBackPain', v)}
+        />
+      </Card>
+
+      <Card className="p-4 space-y-4">
+        <h2 className="font-semibold">8. Hinder</h2>
         <SelectQuestion
           label="Over het geheel genomen, hoe hinderlijk was uw rugpijn in de laatste 2 weken?"
           value={answers.hindrance}
@@ -413,7 +533,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">8. Pijnintensiteit</h2>
+        <h2 className="font-semibold">9. Pijnintensiteit</h2>
         <PainScale
           label="Hoe erg is uw lage rugpijn gemiddeld in de laatste 2 weken? (0 = geen pijn, 10 = ergst denkbare)"
           value={answers.painIntensity}
@@ -425,7 +545,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">9–11. Cognities/symptomen</h2>
+        <h2 className="font-semibold">10–12. Cognities/symptomen</h2>
         <SelectQuestion
           label="In de laatste 2 weken straalde mijn rugpijn wel eens uit naar één of beide benen?"
           value={answers.radiatingToLegs}
@@ -447,7 +567,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">12. Coping</h2>
+        <h2 className="font-semibold">13. Coping</h2>
         <SelectQuestion
           label="In de praktijk zien wij dat mensen verschillend omgaan met rugpijn. Wat past het beste bij u?"
           value={answers.coping}
@@ -472,7 +592,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">13–15. Emoties/stress</h2>
+        <h2 className="font-semibold">14–16. Emoties/stress</h2>
         <YesNoQuestion
           label="Bent u de laatste tijd prikkelbaarder of emotioneler dan normaal?"
           value={answers.irritable}
@@ -491,7 +611,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">16–18. Somberheid/sociaal</h2>
+        <h2 className="font-semibold">17–19. Somberheid/sociaal</h2>
         <YesNoQuestion
           label="Kunt u ondanks uw rugklachten nog plezier beleven aan sociale activiteiten of andere dingen?"
           value={answers.enjoyDespitePain}
@@ -518,7 +638,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">19. Slaap</h2>
+        <h2 className="font-semibold">20. Slaap</h2>
         <SelectQuestion
           label="Over het geheel genomen, hoe ervaarde u uw slaapkwaliteit in de laatste 2 weken?"
           value={answers.sleepQuality}
@@ -534,7 +654,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">20–22. Werk/leven/verwachting</h2>
+        <h2 className="font-semibold">21–23. Werk/leven/verwachting</h2>
         <YesNoQuestion
           label="Ervaart u de laatste tijd werkdruk, stress of andere problemen in uw werk?"
           value={answers.workStress}
@@ -553,7 +673,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">23–25. Leefstijl</h2>
+        <h2 className="font-semibold">24–26. Leefstijl</h2>
         <SelectQuestion
           label="Komt u in een gewone week toe aan voldoende beweging (minstens 150 minuten per week, zoals stevig wandelen, fietsen of sport)?"
           value={answers.movement}
@@ -588,7 +708,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">26. Aandoeningen</h2>
+        <h2 className="font-semibold">27. Aandoeningen</h2>
         <MultiSelectQuestion
           label="Heeft u andere aandoeningen of gezondheidsproblemen? (meerdere opties mogelijk)"
           values={answers.conditions.values as string[]}
@@ -626,7 +746,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       </Card>
 
       <Card className="p-4 space-y-4">
-        <h2 className="font-semibold">27. Medicatie</h2>
+        <h2 className="font-semibold">28. Medicatie</h2>
         <MultiSelectQuestion
           label="Gebruikt u één van de onderstaande medicijnen? (meerdere antwoorden mogelijk)"
           values={answers.medication.values as string[]}
@@ -670,7 +790,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
       <div className="flex items-center gap-2">
         {/* <Button onClick={downloadJSON} disabled={!canDownload}>Opslaan als JSON</Button> */}
         <Button onClick={handleGenerateFollowUps} >
-          {followUpLoading ? 'Vervolg vragen laden…' : 'Vervolg vragen'}
+          {followUpLoading ? 'Vervolgvragen laden…' : 'Vervolgvragen'}
         </Button>
         {/* <div className="text-xs text-muted-foreground">Downloadt uw antwoorden lokaal als JSON-bestand of genereer vervolgvragen.</div> */}
       </div>
@@ -713,7 +833,7 @@ export default function AllQuestionsView({ password }: { password: string }) {
             <h2 className="font-semibold">Vervolgvragen</h2>
             {followUpError && <div className="text-sm text-red-600">{followUpError}</div>}
             {!followUpActive && (
-              <div className="text-sm text-muted-foreground">Klik op "Vervolg vragen" om AI-gegenereerde vervolgvragen te zien.</div>
+              <div className="text-sm text-muted-foreground">Klik op "Vervolgvragen laden" om AI-gegenereerde vervolgvragen te zien.</div>
             )}
             {followUpActive && followUpLoading && (
               <div className="space-y-4">
@@ -795,9 +915,8 @@ export default function AllQuestionsView({ password }: { password: string }) {
 
               {followUpStale && !followUpLoading && (
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="bg-white/80 dark:bg-background/80 border border-border rounded-md px-4 py-2 text-sm flex items-center gap-2 shadow">
-                    <Loader2 className="h-4 w-4 animate-spin text-sky-600" />
-                    <div>Vervolgvragen worden opnieuw gegenereerd.</div>
+                  <div className="bg-white/80 dark:bg-background/80 border border-border rounded-md px-4 py-2 text-sm shadow">
+                    Vervolgvragen zijn verouderd. Klik op “Vervolgvragen laden” om te vernieuwen.
                   </div>
                 </div>
               )}
@@ -831,25 +950,9 @@ export default function AllQuestionsView({ password }: { password: string }) {
                   onClick={async () => {
                     const changed = instructionDraft.trim() !== followUpInstruction.trim();
                     if (changed) {
-                      // commit new instruction
+                      // commit new instruction and mark stale; do NOT auto-regenerate
                       setFollowUpInstruction(instructionDraft);
-                      if (followUpActive && followUpQuestions.length > 0) {
-                        // auto-regenerate if there were already follow-up questions
-                        setFollowUpStale(true);
-                        await generateFollowUps(
-                          answers,
-                          password,
-                          instructionDraft,
-                          setFollowUpQuestions,
-                          setFollowUpAnswers,
-                          setFollowUpLoading,
-                          setFollowUpError
-                        );
-                        setFollowUpStale(false);
-                      } else if (followUpActive) {
-                        // mark stale if active but nothing to regenerate yet
-                        setFollowUpStale(true);
-                      }
+                      if (followUpActive) setFollowUpStale(true);
                     }
                     setInstructionOpen(false);
                   }}
@@ -1182,30 +1285,31 @@ const questionMapping: Record<string, { number: string; question: string }> = {
   'home.situation': { number: '5', question: 'Wat is uw huidige thuissituatie?' },
   'home.other': { number: '5b', question: 'Thuissituatie - Toelichting' },
   duration: { number: '6', question: 'Hoelang heeft u al rugklachten?' },
-  hindrance: { number: '7', question: 'Over het geheel genomen, hoe hinderlijk was uw rugpijn in de laatste 2 weken?' },
-  painIntensity: { number: '8', question: 'Hoe erg is uw lage rugpijn gemiddeld in de laatste 2 weken? (0 = geen pijn, 10 = ergst denkbare)' },
-  radiatingToLegs: { number: '9', question: 'In de laatste 2 weken straalde mijn rugpijn wel eens uit naar één of beide benen?' },
-  worried: { number: '10', question: 'Ik maak mij grote zorgen over mijn rugklachten?' },
-  unsafeActive: { number: '11', question: 'Door mijn rugklachten vind ik het niet veilig om lichamelijk actief te zijn?' },
-  coping: { number: '12', question: 'In de praktijk zien wij dat mensen verschillend omgaan met rugpijn. Wat past het beste bij u?' },
-  copingAvoidDetails: { number: '12b', question: 'Coping - Welke bewegingen/activiteiten vermijdt u?' },
-  irritable: { number: '13', question: 'Bent u de laatste tijd prikkelbaarder of emotioneler dan normaal?' },
-  tension: { number: '14', question: 'Ervaart u de laatste tijd spanning, druk, stress of onrust in uw lichaam?' },
-  rumination: { number: '15', question: 'Heeft u last van piekeren, malen of nadenken zonder dat u dat kunt stoppen?' },
-  enjoyDespitePain: { number: '16', question: 'Kunt u ondanks uw rugklachten nog plezier beleven aan sociale activiteiten of andere dingen?' },
-  depressed: { number: '17', question: 'De laatste tijd voel ik me neerslachtig of depressief' },
-  socialSupport: { number: '18', question: 'In welke mate voelt u zich gesteund en begrepen door de mensen in uw omgeving bij uw rugklachten?' },
-  sleepQuality: { number: '19', question: 'Over het geheel genomen, hoe ervaarde u uw slaapkwaliteit in de laatste 2 weken?' },
-  workStress: { number: '20', question: 'Ervaart u de laatste tijd werkdruk, stress of andere problemen in uw werk?' },
-  privateEvents: { number: '21', question: 'Heeft u de laatste tijd ingrijpende gebeurtenissen of spanningen in uw privéleven ervaren?' },
-  expectInfluence: { number: '22', question: 'Denkt u dat er nog iets te doen is waardoor uw rugklachten beter worden?' },
-  movement: { number: '23', question: 'Komt u in een gewone week toe aan voldoende beweging?' },
-  diet: { number: '24', question: 'Hoe gezond vindt u uw voedingspatroon?' },
-  smoking: { number: '25', question: 'Rookt of vapet u op dit moment?' },
-  'conditions.values': { number: '26', question: 'Heeft u andere aandoeningen of gezondheidsproblemen?' },
-  'conditions.other': { number: '26b', question: 'Aandoeningen - Specificatie andere aandoening' },
-  'medication.values': { number: '27', question: 'Gebruikt u één van de onderstaande medicijnen?' },
-  'medication.other': { number: '27b', question: 'Medicatie - Specificatie andere medicatie' },
+  previousLowBackPain: { number: '7', question: 'Heeft u in het verleden eerder lage rugklachten gehad?' },
+  hindrance: { number: '8', question: 'Over het geheel genomen, hoe hinderlijk was uw rugpijn in de laatste 2 weken?' },
+  painIntensity: { number: '9', question: 'Hoe erg is uw lage rugpijn gemiddeld in de laatste 2 weken? (0 = geen pijn, 10 = ergst denkbare)' },
+  radiatingToLegs: { number: '10', question: 'In de laatste 2 weken straalde mijn rugpijn wel eens uit naar één of beide benen?' },
+  worried: { number: '11', question: 'Ik maak mij grote zorgen over mijn rugklachten?' },
+  unsafeActive: { number: '12', question: 'Door mijn rugklachten vind ik het niet veilig om lichamelijk actief te zijn?' },
+  coping: { number: '13', question: 'In de praktijk zien wij dat mensen verschillend omgaan met rugpijn. Wat past het beste bij u?' },
+  copingAvoidDetails: { number: '13b', question: 'Coping - Welke bewegingen/activiteiten vermijdt u?' },
+  irritable: { number: '14', question: 'Bent u de laatste tijd prikkelbaarder of emotioneler dan normaal?' },
+  tension: { number: '15', question: 'Ervaart u de laatste tijd spanning, druk, stress of onrust in uw lichaam?' },
+  rumination: { number: '16', question: 'Heeft u last van piekeren, malen of nadenken zonder dat u dat kunt stoppen?' },
+  enjoyDespitePain: { number: '17', question: 'Kunt u ondanks uw rugklachten nog plezier beleven aan sociale activiteiten of andere dingen?' },
+  depressed: { number: '18', question: 'De laatste tijd voel ik me neerslachtig of depressief' },
+  socialSupport: { number: '19', question: 'In welke mate voelt u zich gesteund en begrepen door de mensen in uw omgeving bij uw rugklachten?' },
+  sleepQuality: { number: '20', question: 'Over het geheel genomen, hoe ervaarde u uw slaapkwaliteit in de laatste 2 weken?' },
+  workStress: { number: '21', question: 'Ervaart u de laatste tijd werkdruk, stress of andere problemen in uw werk?' },
+  privateEvents: { number: '22', question: 'Heeft u de laatste tijd ingrijpende gebeurtenissen of spanningen in uw privéleven ervaren?' },
+  expectInfluence: { number: '23', question: 'Denkt u dat er nog iets te doen is waardoor uw rugklachten beter worden?' },
+  movement: { number: '24', question: 'Komt u in een gewone week toe aan voldoende beweging?' },
+  diet: { number: '25', question: 'Hoe gezond vindt u uw voedingspatroon?' },
+  smoking: { number: '26', question: 'Rookt of vapet u op dit moment?' },
+  'conditions.values': { number: '27', question: 'Heeft u andere aandoeningen of gezondheidsproblemen?' },
+  'conditions.other': { number: '27b', question: 'Aandoeningen - Specificatie andere aandoening' },
+  'medication.values': { number: '28', question: 'Gebruikt u één van de onderstaande medicijnen?' },
+  'medication.other': { number: '28b', question: 'Medicatie - Specificatie andere medicatie' },
 };
 
 function buildQuestionsAndAnswers(answers: Answers) {
@@ -1224,12 +1328,12 @@ function buildQuestionsAndAnswers(answers: Answers) {
   };
 
   // Persoonsgegevens
-  addEntry('gender', answers.gender);
+  addEntry('gender', answers.gender ? genderMap[String(answers.gender)] ?? answers.gender : '');
   addEntry('age', answers.age);
-  addEntry('language', answers.language);
+  addEntry('language', answers.language ? languageMap[String(answers.language)] ?? answers.language : '');
   
   // Numbered questions
-  addEntry('education', answers.education);
+  addEntry('education', answers.education ? educationMap[String(answers.education)] ?? answers.education : '');
   addEntry('work.job', answers.work.job);
   addEntry('work.hoursPerWeek', answers.work.hoursPerWeek);
   
@@ -1240,39 +1344,42 @@ function buildQuestionsAndAnswers(answers: Answers) {
   addEntry('sport.name', answers.sport.name);
   addEntry('sport.hoursPerWeek', answers.sport.hoursPerWeek);
   
-  addEntry('home.situation', answers.home.situation);
+  addEntry('home.situation', answers.home.situation ? homeSituationMap[String(answers.home.situation)] ?? answers.home.situation : '');
   if (answers.home.other) addEntry('home.other', answers.home.other);
   
-  addEntry('duration', answers.duration);
-  addEntry('hindrance', answers.hindrance);
+  addEntry('duration', answers.duration ? durationMap[String(answers.duration)] ?? answers.duration : '');
+  addEntry('previousLowBackPain', answers.previousLowBackPain === null ? '' : (answers.previousLowBackPain ? 'Ja' : 'Nee'));
+  addEntry('hindrance', answers.hindrance ? severityMap[String(answers.hindrance)] ?? answers.hindrance : '');
   addEntry('painIntensity', answers.painIntensity);
-  addEntry('radiatingToLegs', answers.radiatingToLegs);
-  addEntry('worried', answers.worried);
-  addEntry('unsafeActive', answers.unsafeActive);
-  addEntry('coping', answers.coping);
+  addEntry('radiatingToLegs', answers.radiatingToLegs ? agreeMap[String(answers.radiatingToLegs)] ?? answers.radiatingToLegs : '');
+  addEntry('worried', answers.worried ? agreeMap[String(answers.worried)] ?? answers.worried : '');
+  addEntry('unsafeActive', answers.unsafeActive ? agreeMap[String(answers.unsafeActive)] ?? answers.unsafeActive : '');
+  addEntry('coping', answers.coping ? (copingMap[String(answers.coping)] ?? answers.coping) : '');
   if (answers.copingAvoidDetails) addEntry('copingAvoidDetails', answers.copingAvoidDetails);
   
-  addEntry('irritable', answers.irritable);
-  addEntry('tension', answers.tension);
-  addEntry('rumination', answers.rumination);
-  addEntry('enjoyDespitePain', answers.enjoyDespitePain);
-  addEntry('depressed', answers.depressed);
-  addEntry('socialSupport', answers.socialSupport);
-  addEntry('sleepQuality', answers.sleepQuality);
-  addEntry('workStress', answers.workStress);
-  addEntry('privateEvents', answers.privateEvents);
-  addEntry('expectInfluence', answers.expectInfluence);
-  addEntry('movement', answers.movement);
-  addEntry('diet', answers.diet);
-  addEntry('smoking', answers.smoking);
+  addEntry('irritable', answers.irritable === null ? '' : (answers.irritable ? 'Ja' : 'Nee'));
+  addEntry('tension', answers.tension === null ? '' : (answers.tension ? 'Ja' : 'Nee'));
+  addEntry('rumination', answers.rumination === null ? '' : (answers.rumination ? 'Ja' : 'Nee'));
+  addEntry('enjoyDespitePain', answers.enjoyDespitePain === null ? '' : (answers.enjoyDespitePain ? 'Ja' : 'Nee'));
+  addEntry('depressed', answers.depressed ? agreeMap[String(answers.depressed)] ?? answers.depressed : '');
+  addEntry('socialSupport', answers.socialSupport ? supportMap[String(answers.socialSupport)] ?? answers.socialSupport : '');
+  addEntry('sleepQuality', answers.sleepQuality ? sleepMap[String(answers.sleepQuality)] ?? answers.sleepQuality : '');
+  addEntry('workStress', answers.workStress === null ? '' : (answers.workStress ? 'Ja' : 'Nee'));
+  addEntry('privateEvents', answers.privateEvents === null ? '' : (answers.privateEvents ? 'Ja' : 'Nee'));
+  addEntry('expectInfluence', answers.expectInfluence === null ? '' : (answers.expectInfluence ? 'Ja' : 'Nee'));
+  addEntry('movement', answers.movement ? movementMap[String(answers.movement)] ?? answers.movement : '');
+  addEntry('diet', answers.diet ? dietMap[String(answers.diet)] ?? answers.diet : '');
+  addEntry('smoking', answers.smoking ? smokeMap[String(answers.smoking)] ?? answers.smoking : '');
   
   if (answers.conditions.values.length > 0) {
-    addEntry('conditions.values', answers.conditions.values);
+    const labels = answers.conditions.values.map(v => conditionMap[String(v)] ?? v);
+    addEntry('conditions.values', labels);
   }
   if (answers.conditions.other) addEntry('conditions.other', answers.conditions.other);
   
   if (answers.medication.values.length > 0) {
-    addEntry('medication.values', answers.medication.values);
+    const labels = answers.medication.values.map(v => medicationMap[String(v)] ?? v);
+    addEntry('medication.values', labels);
   }
   if (answers.medication.other) addEntry('medication.other', answers.medication.other);
   
@@ -1293,7 +1400,8 @@ async function generateFollowUps(
   try {
     const questionsAndAnswers = buildQuestionsAndAnswers(answers);
     
-    const res = await fetch('https://api.fynlo.nl/followups-experimental', {
+    // const res = await fetch('https://api.fynlo.nl/followups-experimental', {
+      const res = await fetch('http://localhost:8011/followups-experimental', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -1309,7 +1417,7 @@ async function generateFollowUps(
     }
     const data = await res.json() as { questions?: FollowUpQuestion[] };
     const questionsArr = data?.questions;
-    const qs: FollowUpQuestion[] = Array.isArray(questionsArr) ? questionsArr.slice(0, 10) : [];
+    const qs: FollowUpQuestion[] = Array.isArray(questionsArr) ? questionsArr : [];
     setQuestions(qs);
     setFUAnswers(() => {
       const next: Record<string, FollowUpAnswer> = {};
