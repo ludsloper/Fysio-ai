@@ -1400,8 +1400,8 @@ async function generateFollowUps(
   try {
     const questionsAndAnswers = buildQuestionsAndAnswers(answers);
     
-    // const res = await fetch('https://api.fynlo.nl/followups-experimental', {
-      const res = await fetch('http://localhost:8011/followups-experimental', {
+    const res = await fetch('https://api.fynlo.nl/followups-experimental', {
+      // const res = await fetch('http://localhost:8011/followups-experimental', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
